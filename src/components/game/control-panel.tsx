@@ -136,7 +136,7 @@ export function ControlPanel({
                             <Plus className="h-5 w-5 md:h-6 md:w-6" />
                         </Button>
                         <span className="text-2xl md:text-3xl font-bold font-mono px-1 cyan-text-glow leading-none">
-                            R{betPerPayline.toFixed(2)}
+                            R{totalBet.toFixed(2)}
                         </span>
                         <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
                             <Minus className="h-5 w-5 md:h-6 md:w-6" />
@@ -363,7 +363,7 @@ export function ControlPanel({
                                         <Plus className="h-3 w-3" />
                                     </Button>
                                     <span className="text-sm font-bold font-mono px-1 cyan-text-glow">
-                                        R{betPerPayline.toFixed(2)}
+                                        R{totalBet.toFixed(2)}
                                     </span>
                                     <Button variant="ghost" size="icon" className="h-4 w-4 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
                                         <Minus className="h-3 w-3" />

@@ -36,15 +36,15 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
         }
     }, [shouldBounce, isTurboMode, isSpinning]);
 
-    // Calculate dynamic height based on numRows and fixed symbol size for 1080px layout
-    // Fixed layout: 1080px wide container, 5 reels
-    // Symbol size: ~196px (calculated to fit 1080px with padding and gaps)
+    // Calculate dynamic height based on numRows and fixed symbol size for 1296px layout
+    // Fixed layout: 1296px wide container, 5 reels
+    // Symbol size: ~259px (calculated to fit 1296px with no padding and no gaps)
     useEffect(() => {
-        // Fixed symbol size for vertical cabinet layout (1080px wide)
-        // Calculation: (1080px - 32px padding - 16px gaps) / 5 reels = 206.4px per symbol
-        const symbolHeightFixed = 196; // Fixed size for 1080px layout
-        const gap = 4; // gap-1 (reduced from gap-4 to make borders visible)
-        const borderPadding = 8; // Extra padding for borders (4px border + 4px margin)
+        // Fixed symbol size for vertical cabinet layout (1296px wide)
+        // Calculation: 1296px / 5 reels = 259.2px per symbol
+        const symbolHeightFixed = 259; // Fixed size for 1296px layout
+        const gap = 0; // No gap between symbols
+        const borderPadding = 0; // No extra padding
         
         // Fixed height calculation for vertical cabinet
         const height = (numRows * symbolHeightFixed) + ((numRows - 1) * gap) + borderPadding;
@@ -64,7 +64,7 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
         >
             <div
                 className={cn(
-                    'flex flex-col gap-1 transform-gpu will-change-transform relative',
+                    'flex flex-col gap-0 transform-gpu will-change-transform relative',
                     isSpinning && 'animate-reel-spin',
                     isStopping && 'animate-reel-bounce',
                     isExpanding && 'animate-expand-reel'
@@ -80,7 +80,7 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
                     <SymbolDisplay 
                         key={i} 
                         symbolId={symbolId} 
-                        className="w-[196px] h-[196px] flex-shrink-0"
+                        className="w-full h-[259px] flex-shrink-0"
                         winningLineIndices={isExpanded ? [] : winningLineIndicesForColumn[i]} // Don't show winning line highlights if entire reel is expanded
                         isExpandedReel={isExpanded} // Pass flag to show yellow border
                     />

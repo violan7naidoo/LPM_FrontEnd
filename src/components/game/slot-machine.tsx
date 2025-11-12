@@ -25,7 +25,13 @@ import { useGameConfig } from '@/hooks/use-game-config';
 import useSound from 'use-sound';
 import { SOUNDS } from '@/lib/sounds';
 
-export function SlotMachine() {
+interface SlotMachineProps {
+  betAmount: number;
+  setBetAmount: (amount: number) => void;
+  betPerPayline: number;
+}
+
+export function SlotMachine({ betAmount, setBetAmount, betPerPayline }: SlotMachineProps) {
   // Get config values from hooks
   const numReels = useNumReels();
   const numRows = useNumRows();
@@ -70,11 +76,7 @@ export function SlotMachine() {
   
   const [spinningReels, setSpinningReels] = useState<boolean[]>([]);
   const [balance, setBalance] = useState(500); // Start at 500
-  const [betAmount, setBetAmount] = useState(betAmounts[0] || 1.00); // Total bet amount (R1, R2, R3, R5)
   const [numPaylines] = useState(5); // Always 5 paylines (static)
-  
-  // Calculate bet per payline for backend (total bet / number of paylines)
-  const betPerPayline = betAmount / numPaylines;
   const totalBet = betAmount; // Total bet is the bet amount selected
   const [lastWin, setLastWin] = useState(0);
   const [winningLines, setWinningLines] = useState<WinningLine[]>([]);
@@ -202,18 +204,30 @@ export function SlotMachine() {
     if (!config) return;
     playClickSound();
     const currentIndex = config.betAmounts.indexOf(betAmount);
-    if (currentIndex < config.betAmounts.length - 1) {
-      setBetAmount(config.betAmounts[currentIndex + 1]);
+    if (currentIndex === -1) {
+      // If betAmount not found, set to first value
+      setBetAmount(config.betAmounts[0]);
+      return;
     }
+    // Circular: if at last index, wrap to first
+    const nextIndex = (currentIndex + 1) % config.betAmounts.length;
+    setBetAmount(config.betAmounts[nextIndex]);
   }, [betAmount, config, playClickSound]);
 
   const handleDecreaseBet = useCallback(() => {
     if (!config) return;
     playClickSound();
     const currentIndex = config.betAmounts.indexOf(betAmount);
-    if (currentIndex > 0) {
-      setBetAmount(config.betAmounts[currentIndex - 1]);
+    if (currentIndex === -1) {
+      // If betAmount not found, set to first value
+      setBetAmount(config.betAmounts[0]);
+      return;
     }
+    // Circular: if at first index, wrap to last
+    const prevIndex = currentIndex === 0 
+      ? config.betAmounts.length - 1 
+      : currentIndex - 1;
+    setBetAmount(config.betAmounts[prevIndex]);
   }, [betAmount, config, playClickSound]);
 
   // Paylines are static at 5 - no handlers needed
@@ -779,57 +793,58 @@ export function SlotMachine() {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center flex-1 w-full min-h-0 overflow-hidden">
-        <div className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-card/50 border-2 md:border-4 shadow-2xl w-full h-full relative flex-1 min-h-0 ${
-          isFreeSpinsMode
-            ? 'border-yellow-400'
-            : 'border-primary/50'
-        }`}>
-          <div className="relative w-full h-full flex justify-center items-center">
-            <PaylineNumbers 
-              winningLines={winningLines} 
-              isSpinning={isSpinning}
-              numPaylines={numPaylines}
-            >
-              <div 
-                className="grid gap-1 p-4 pb-6 bg-black/30 rounded-lg relative w-full h-full"
-                style={{ 
-                  gridTemplateColumns: `repeat(${numReels}, minmax(0, 1fr))`,
-                  maxWidth: '1080px',
-                  margin: '0 auto'
-                }}
+      <div className="flex flex-col w-full h-full min-h-0">
+        <div className="flex flex-col items-center justify-center flex-1 w-full min-h-0 overflow-hidden">
+          <div className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-card/50 border-2 md:border-4 shadow-2xl w-full h-full relative flex-1 min-h-0 ${
+            isFreeSpinsMode
+              ? 'border-yellow-400'
+              : 'border-primary/50'
+          }`}>
+            <div className="relative w-full h-full flex justify-center items-center">
+              <PaylineNumbers 
+                winningLines={winningLines} 
+                isSpinning={isSpinning}
+                numPaylines={numPaylines}
               >
-                {config && numReels > 0 && Array.from({ length: numReels }).map((_, i) => (
-                  <ReelColumn
-                    key={i}
-                    symbols={getReelSymbols(i)}
-                    isSpinning={spinningReels[i]}
-                    reelIndex={i}
-                    winningLineIndicesForColumn={
-                      Array(numRows).fill(0).map((_, j) => getWinningLineIndices(i, j))
-                    }
-                    isTurboMode={isTurboMode}
-                    shouldBounce={bouncingReels[i]}
-                    isExpanding={expandingReels[i]}
-                    isExpanded={showFeatureGameWins && reelsToExpand.includes(i)} // Only show yellow border when winning lines are displayed
-                  />
-                ))}
-                
-                {!isSpinning && winningLines.length > 0 && (
-                  <WinningLinesDisplay 
-                    winningLines={winningLines.filter(l => l.paylineIndex !== -1)} 
-                  />
-                )}
-              </div>
-            </PaylineNumbers>
+                <div 
+                  className="grid gap-0 p-0 bg-black/30 rounded-lg relative w-full h-full"
+                  style={{ 
+                    gridTemplateColumns: `repeat(${numReels}, minmax(0, 1fr))`,
+                    maxWidth: '1296px',
+                    margin: '0 auto'
+                  }}
+                >
+                  {config && numReels > 0 && Array.from({ length: numReels }).map((_, i) => (
+                    <ReelColumn
+                      key={i}
+                      symbols={getReelSymbols(i)}
+                      isSpinning={spinningReels[i]}
+                      reelIndex={i}
+                      winningLineIndicesForColumn={
+                        Array(numRows).fill(0).map((_, j) => getWinningLineIndices(i, j))
+                      }
+                      isTurboMode={isTurboMode}
+                      shouldBounce={bouncingReels[i]}
+                      isExpanding={expandingReels[i]}
+                      isExpanded={showFeatureGameWins && reelsToExpand.includes(i)} // Only show yellow border when winning lines are displayed
+                    />
+                  ))}
+                  
+                  {!isSpinning && winningLines.length > 0 && (
+                    <WinningLinesDisplay 
+                      winningLines={winningLines.filter(l => l.paylineIndex !== -1)} 
+                    />
+                  )}
+                </div>
+              </PaylineNumbers>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Control Panel - positioned at bottom */}
-      <div className="w-full flex-shrink-0">
+        {/* Control Panel - positioned at bottom */}
+        <div className="w-full flex-shrink-0 mt-2">
         <ControlPanel
-        betPerPayline={betAmount}
+        betPerPayline={betPerPayline}
         numPaylines={numPaylines}
         totalBet={totalBet}
         balance={balance}
@@ -858,6 +873,7 @@ export function SlotMachine() {
         onStopAutoplay={stopAutoplay}
         onShowAutoplayDialog={() => setShowAutoplayDialog(true)}
         />
+        </div>
       </div>
 
       {/* Autoplay Dialog */}

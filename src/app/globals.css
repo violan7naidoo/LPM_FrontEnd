@@ -104,8 +104,8 @@
 }
 
 .game-container {
-  width: 1080px;
-  height: 1920px;
+  width: 1296px;
+  height: 2550px;
   margin: auto;
   background: url('/images/backround/bg.png') no-repeat center center;
   background-size: cover;
