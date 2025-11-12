@@ -1,12 +1,14 @@
-import { SlotMachine } from "@/components/game/slot-machine";
+import { TopSection } from "@/components/game/TopSection";
+import { MiddleSection } from "@/components/game/MiddleSection";
+import { BottomSection } from "@/components/game/BottomSection";
 
 export default function Home() {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden">
-      <div className="relative z-10">
-        <SlotMachine />
-      </div>
-    </main>
+    <div className="game-container">
+      <TopSection />
+      <MiddleSection />
+      <BottomSection />
+    </div>
   );
 }
 

@@ -7,6 +7,7 @@ import { PaylineNumbers } from './payline-numbers';
 import { ControlPanel } from './control-panel';
 import { AutoplayDialog } from './autoplay-dialog';
 import { FeatureSymbolSelection } from './feature-symbol-selection';
+import { WinAnimation, getWinningFeedback } from './win-animation';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { gameApi, type PlayResponse, type SpinResult } from '@/lib/game-api';
@@ -21,6 +22,8 @@ import {
   type WinningLine
 } from '@/lib/slot-config';
 import { useGameConfig } from '@/hooks/use-game-config';
+import useSound from 'use-sound';
+import { SOUNDS } from '@/lib/sounds';
 
 export function SlotMachine() {
   // Get config values from hooks
@@ -90,6 +93,64 @@ export function SlotMachine() {
   const [isSfxEnabled, setIsSfxEnabled] = useState(true);
   const [volume, setVolume] = useState(50);
   
+  // Sound configuration
+  const soundConfig = useMemo(() => ({
+    soundEnabled: isSfxEnabled,
+    volume: volume / 100, // Convert 0-100 to 0-1
+  }), [isSfxEnabled, volume]);
+
+  const musicConfig = useMemo(() => ({
+    soundEnabled: isMusicEnabled,
+    volume: volume / 100, // Convert 0-100 to 0-1
+  }), [isMusicEnabled, volume]);
+
+  // Sound hooks
+  const [playBgMusic, { stop: stopBgMusic }] = useSound(SOUNDS.background, {
+    ...musicConfig,
+    loop: true
+  });
+  const [playSpinSound, { stop: stopSpinSound }] = useSound(SOUNDS.spin, {
+    ...soundConfig,
+    loop: true, // Loop while spinning
+  });
+  const [playReelStopSound] = useSound(SOUNDS.reelStop, { ...soundConfig, loop: false });
+  const [playWinSound] = useSound(SOUNDS.win, soundConfig);
+  const [playBigWinSound] = useSound(SOUNDS.bigWin, soundConfig);
+  const [playFreeSpinsTriggerSound] = useSound(SOUNDS.featureTrigger, soundConfig);
+  const [playClickSound] = useSound(SOUNDS.click, soundConfig);
+  const [playFreeSpinsMusic, { stop: stopFreeSpinsMusic }] = useSound(SOUNDS.freeSpinsMusic, {
+    ...musicConfig,
+    loop: true
+  });
+  
+  // Background music management
+  const isFreeSpinsMode = useMemo(() => freeSpinsRemaining > 0, [freeSpinsRemaining]);
+  
+  useEffect(() => {
+    // If music is disabled, stop all music
+    if (!isMusicEnabled) {
+      stopBgMusic();
+      stopFreeSpinsMusic();
+      return;
+    }
+
+    // If in free spins mode, play the free spins music
+    // Otherwise, play the normal background music
+    if (isFreeSpinsMode) {
+      stopBgMusic();
+      playFreeSpinsMusic();
+    } else {
+      stopFreeSpinsMusic();
+      playBgMusic();
+    }
+
+    // Cleanup function to stop all music when the component unmounts
+    return () => {
+      stopBgMusic();
+      stopFreeSpinsMusic();
+    };
+  }, [isFreeSpinsMode, isMusicEnabled, playBgMusic, stopBgMusic, playFreeSpinsMusic, stopFreeSpinsMusic]);
+  
   // Autoplay state
   type AutoplaySettings = {
     numberOfSpins: number;
@@ -119,26 +180,41 @@ export function SlotMachine() {
   const [showFeatureSymbolSelection, setShowFeatureSymbolSelection] = useState(false);
   const [pendingFeatureSymbol, setPendingFeatureSymbol] = useState<string>('');
   const [pendingFreeSpinsCount, setPendingFreeSpinsCount] = useState(0);
+  const [winningFeedback, setWinningFeedback] = useState<{
+    feedbackText: string;
+    winAmount: number;
+    animationType: string;
+  } | null>(null);
 
-  const isFreeSpinsMode = useMemo(() => freeSpinsRemaining > 0, [freeSpinsRemaining]);
   const isSpinning = useMemo(() => spinningReels.some(s => s), [spinningReels]);
+  
+  const handleWinAnimationComplete = useCallback(() => {
+    setWinningFeedback(null);
+  }, []);
+  
+  const handleWinCountComplete = useCallback((amount: number) => {
+    // Called when the count-up animation completes
+    // Can be used to update lastWin if needed
+  }, []);
 
   // Handlers for bet and paylines
   const handleIncreaseBet = useCallback(() => {
     if (!config) return;
+    playClickSound();
     const currentIndex = config.betAmounts.indexOf(betAmount);
     if (currentIndex < config.betAmounts.length - 1) {
       setBetAmount(config.betAmounts[currentIndex + 1]);
     }
-  }, [betAmount, config]);
+  }, [betAmount, config, playClickSound]);
 
   const handleDecreaseBet = useCallback(() => {
     if (!config) return;
+    playClickSound();
     const currentIndex = config.betAmounts.indexOf(betAmount);
     if (currentIndex > 0) {
       setBetAmount(config.betAmounts[currentIndex - 1]);
     }
-  }, [betAmount, config]);
+  }, [betAmount, config, playClickSound]);
 
   // Paylines are static at 5 - no handlers needed
   const handleIncreasePaylines = useCallback(() => {
@@ -261,6 +337,11 @@ export function SlotMachine() {
     setFeatureGameWinningLines([]);
     setShowFeatureGameWins(false);
     setReelsToExpand([]); // Clear expanded reels at start of new spin
+    setWinningFeedback(null); // Clear any existing win animation
+
+    // Play spin sound
+    stopSpinSound();
+    playSpinSound();
 
     // Asynchronously start reels one by one to ensure staggering
     const startDelay = isTurboMode ? 0 : 10;
@@ -368,6 +449,10 @@ export function SlotMachine() {
       }
 
       // Animate reels stopping one by one
+      // IMPORTANT: Keep winning lines cleared during reel stopping to maintain anticipation
+      setWinningLines([]);
+      setShowFeatureGameWins(false);
+      
       const stopBaseDelay = isTurboMode ? 5 : 40;
       const stopIncrementDelay = isTurboMode ? 2 : 20;
       const gridUpdateDelay = isTurboMode ? 2 : 20;
@@ -384,6 +469,9 @@ export function SlotMachine() {
 
         // Small delay to ensure grid update completes
         await new Promise(resolve => setTimeout(resolve, gridUpdateDelay));
+        
+        // Play reel stop sound
+        playReelStopSound();
         
         // Trigger bounce animation for this reel
         setBouncingReels(prev => {
@@ -408,6 +496,12 @@ export function SlotMachine() {
         });
       }
 
+      // Stop spin sound when all reels have stopped
+      stopSpinSound();
+
+      // Wait a moment after all reels stop to let the grid settle
+      await new Promise(resolve => setTimeout(resolve, isTurboMode ? 200 : 500));
+
       // Show base game wins first (if in free spins mode)
       if (isFreeSpinsMode) {
         // Add scatter win to base game if applicable
@@ -425,31 +519,28 @@ export function SlotMachine() {
           }
         }
         
-        // PHASE 1: Show base game wins FIRST
-        // Ensure grid is stable and showing original symbols
-        setGrid(originalGrid);
-        setWinningLines(baseGameLines);
-        setBaseGameWinningLines(baseGameLines);
-        
-        // Wait to show base game wins (user needs time to see and digest)
+        // PHASE 1: Show base game grid and wins FIRST (if any)
+        // Ensure grid is stable and showing original symbols (already set during reel stop)
+        // Base game wins should persist until expansion or next spin (like normal game)
         if (baseGameLines.length > 0) {
-          // Show base game wins for a moment before clearing for expansion
-          await new Promise(resolve => setTimeout(resolve, isTurboMode ? 2000 : 3000));
+          setWinningLines(baseGameLines);
+          setBaseGameWinningLines(baseGameLines);
+          // Base game wins will stay visible until expansion happens or next spin
         } else {
           // Even if no base game wins, wait a bit to show the grid
-          await new Promise(resolve => setTimeout(resolve, isTurboMode ? 1000 : 1500));
+          await new Promise(resolve => setTimeout(resolve, isTurboMode ? 500 : 1000));
         }
         
-        // Clear base game wins before expansion (they'll be replaced by feature game wins)
-        setWinningLines([]);
-        
-        // PHASE 2: Expansion animation (only if 3+ reels have feature symbol)
-        if (reelsToExpandArray.length >= 3 && response.featureSymbol) {
-          // Ensure winning lines are cleared during expansion
+        // PHASE 2: Expansion animation
+        // Queen, Stone, Leopard, Wolf: expand with 2+ reels
+        // Card symbols (10, J, K, Q, A) and all other symbols: expand with 3+ reels
+        const expansionThreshold = (response.featureSymbol === 'Queen' || response.featureSymbol === 'Stone' || response.featureSymbol === 'Leopard' || response.featureSymbol === 'Wolf') ? 2 : 3;
+        if (reelsToExpandArray.length >= expansionThreshold && response.featureSymbol) {
+          // Clear base game wins before expansion (they'll be replaced by feature game wins)
           setWinningLines([]);
           setShowFeatureGameWins(false);
           
-          // Wait a moment before expansion starts
+          // Wait a moment before expansion starts to build anticipation
           await new Promise(resolve => setTimeout(resolve, isTurboMode ? 500 : 1000));
           
           // Animate expansion for each reel that needs to expand
@@ -485,15 +576,17 @@ export function SlotMachine() {
             });
           }
           
-          // Wait after all expansions complete - ensure grid is fully updated
+          // Wait after all expansions complete - ensure grid is fully updated and expansion animation is done
           await new Promise(resolve => setTimeout(resolve, isTurboMode ? 500 : 1000));
           
           // PHASE 3: Show feature game wins ONLY AFTER expansion is complete
-          // Keep them visible until the next spin (no delay - they persist)
+          // This is when borders and animations should START appearing
           if (featureGameLines.length > 0) {
+            // Set the winning lines - this will trigger borders and animations
             setFeatureGameWinningLines(featureGameLines);
             setWinningLines(featureGameLines);
-            setShowFeatureGameWins(true); // This flag enables the borders to show
+            // Enable feature game wins - this allows borders to show on expanded reels
+            setShowFeatureGameWins(true);
             // No delay - winning lines will stay visible until next spin starts
           }
         } else {
@@ -527,6 +620,7 @@ export function SlotMachine() {
       // Show feature symbol selection animation if free spins were triggered (only if NOT already in free spins)
       // When retriggering free spins, the feature symbol doesn't change, so no animation needed
       if (response.player.results.scatterWin.triggeredFreeSpins && response.featureSymbol && !isFreeSpinsMode) {
+        playFreeSpinsTriggerSound();
         setPendingFeatureSymbol(response.featureSymbol);
         setPendingFreeSpinsCount(response.freeSpins);
         setShowFeatureSymbolSelection(true);
@@ -541,10 +635,27 @@ export function SlotMachine() {
       }
 
       if (response.player.lastWin > 0) {
-        toast({
-          title: 'Win!',
-            description: `You won R${response.player.lastWin.toFixed(2)}!`,
-        });
+          // Play win sound - big win for wins > 5x bet, regular win otherwise
+          if (response.player.lastWin > totalBet * 5) {
+            playBigWinSound();
+          } else {
+            playWinSound();
+          }
+          
+          // Get winning symbols for the win animation
+          const winningSymbols = [...new Set(
+            (response.player.results.winningLines || []).map((l: WinningLine) => l.symbol)
+          )];
+          
+          // Generate and show win animation
+          const feedback = getWinningFeedback(
+            response.player.lastWin,
+            winningSymbols,
+            totalBet
+          );
+          setWinningFeedback(feedback);
+          
+          // Don't show toast - the animation will handle it
         }
       }
 
@@ -554,6 +665,7 @@ export function SlotMachine() {
 
     } catch (error) {
       console.error("Failed to fetch spin result:", error);
+      stopSpinSound(); // Stop spin sound on error
       toast({
         variant: "destructive",
         title: "Connection Error",
@@ -562,7 +674,7 @@ export function SlotMachine() {
       setSpinningReels(Array(numReels).fill(false));
       return null;
     }
-  }, [isSpinning, balance, totalBet, numPaylines, betPerPayline, freeSpinsRemaining, actionGameSpins, sessionId, isTurboMode, numReels, numRows, toast, betAmount]);
+  }, [isSpinning, balance, totalBet, numPaylines, betPerPayline, freeSpinsRemaining, actionGameSpins, sessionId, isTurboMode, numReels, numRows, toast, betAmount, playSpinSound, stopSpinSound, playReelStopSound, playWinSound, playBigWinSound, playFreeSpinsTriggerSound, getWinningFeedback]);
 
   // Autoplay effect - handles automatic spinning with stop conditions
   useEffect(() => {
@@ -583,7 +695,7 @@ export function SlotMachine() {
       return;
     }
     
-    if (!isSpinning && balance >= totalBet && !isFreeSpinsMode && actionGameSpins === 0) {
+    if (!isSpinning && !winningFeedback && balance >= totalBet && !isFreeSpinsMode && actionGameSpins === 0) {
       const timer = setTimeout(() => {
         spin().then((spinResult) => {
           if (spinResult && checkAutoplayStopConditions(spinResult)) {
@@ -601,7 +713,7 @@ export function SlotMachine() {
       
       return () => clearTimeout(timer);
     }
-  }, [autoplayState, isSpinning, balance, totalBet, isFreeSpinsMode, actionGameSpins, isTurboMode, spin, checkAutoplayStopConditions, stopAutoplay, toast]);
+  }, [autoplayState, isSpinning, winningFeedback, balance, totalBet, isFreeSpinsMode, actionGameSpins, isTurboMode, spin, checkAutoplayStopConditions, stopAutoplay, toast]);
 
   // For spinning reels, show the reel strip for animation (matching original behavior)
   const getReelSymbols = (reelIndex: number): SymbolId[] => {
@@ -617,7 +729,10 @@ export function SlotMachine() {
 
     // Only show feature game wins AFTER expansion is complete (showFeatureGameWins is true)
     // This ensures borders don't appear before the expansion animation
-    const isShowingFeatureGameWins = isFreeSpinsMode && showFeatureGameWins && reelsToExpand.length >= 3;
+    // Queen, Stone, Leopard, Wolf: expand with 2+ reels
+    // All other symbols: expand with 3+ reels
+    const expansionThreshold = (featureSymbol === 'Queen' || featureSymbol === 'Stone' || featureSymbol === 'Leopard' || featureSymbol === 'Wolf') ? 2 : 3;
+    const isShowingFeatureGameWins = isFreeSpinsMode && showFeatureGameWins && reelsToExpand.length >= expansionThreshold;
     const gridSymbol = grid[reelIndex]?.[rowIndex];
 
     return winningLines.reduce((acc, line, lineIndex) => {
@@ -626,11 +741,13 @@ export function SlotMachine() {
         // Regular payline wins
         // Check if this payline is active and matches the position
         if (line.paylineIndex < numPaylines && line.line[reelIndex] === rowIndex) {
-          // For feature game wins: only show on expanded reels AFTER expansion completes
+          // For feature game wins: only show on expanded reels AND only on the feature symbol
           // For base game wins: show if within the winning count
           if (isShowingFeatureGameWins) {
-            // Feature game: only show if this reel is expanded AND expansion is complete
-            if (reelsToExpand.includes(reelIndex)) {
+            // Feature game: only show if:
+            // 1. This reel is expanded
+            // 2. The symbol at this position is the feature symbol (expanded symbols are all feature symbol)
+            if (reelsToExpand.includes(reelIndex) && gridSymbol === line.symbol) {
               acc.push(line.paylineIndex);
             }
           } else {
@@ -663,11 +780,7 @@ export function SlotMachine() {
   return (
     <>
       <div className="flex flex-col items-center justify-center flex-1 w-full min-h-0 overflow-hidden">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-headline uppercase tracking-wider font-bold leading-tight mb-2 text-center gold-text-glow flex-shrink-0">
-          {config?.gameName?.toUpperCase() || 'FROSTY FORTUNES'}
-        </h1>
-
-        <div className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-card/50 border-2 md:border-4 shadow-2xl w-full max-w-[95vw] relative flex-1 min-h-0 ${
+        <div className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-card/50 border-2 md:border-4 shadow-2xl w-full h-full relative flex-1 min-h-0 ${
           isFreeSpinsMode
             ? 'border-yellow-400'
             : 'border-primary/50'
@@ -679,8 +792,12 @@ export function SlotMachine() {
               numPaylines={numPaylines}
             >
               <div 
-                className="grid gap-4 p-4 bg-black/30 rounded-lg relative w-full h-full"
-                style={{ gridTemplateColumns: `repeat(${numReels}, minmax(0, 1fr))` }}
+                className="grid gap-4 p-4 pb-6 bg-black/30 rounded-lg relative w-full h-full"
+                style={{ 
+                  gridTemplateColumns: `repeat(${numReels}, minmax(0, 1fr))`,
+                  maxWidth: '1080px',
+                  margin: '0 auto'
+                }}
               >
                 {config && numReels > 0 && Array.from({ length: numReels }).map((_, i) => (
                   <ReelColumn
@@ -694,14 +811,13 @@ export function SlotMachine() {
                     isTurboMode={isTurboMode}
                     shouldBounce={bouncingReels[i]}
                     isExpanding={expandingReels[i]}
-                    isExpanded={reelsToExpand.includes(i)} // Highlight entire reel if it's expanded
+                    isExpanded={showFeatureGameWins && reelsToExpand.includes(i)} // Only show yellow border when winning lines are displayed
                   />
                 ))}
                 
                 {!isSpinning && winningLines.length > 0 && (
                   <WinningLinesDisplay 
                     winningLines={winningLines.filter(l => l.paylineIndex !== -1)} 
-                    expandedReels={isFreeSpinsMode && reelsToExpand.length >= 3 ? reelsToExpand : []}
                   />
                 )}
               </div>
@@ -710,8 +826,9 @@ export function SlotMachine() {
         </div>
       </div>
 
-      {/* Control Panel */}
-      <ControlPanel
+      {/* Control Panel - positioned at bottom */}
+      <div className="w-full flex-shrink-0">
+        <ControlPanel
         betPerPayline={betAmount}
         numPaylines={numPaylines}
         totalBet={totalBet}
@@ -740,7 +857,8 @@ export function SlotMachine() {
         onStartAutoplay={startAutoplay}
         onStopAutoplay={stopAutoplay}
         onShowAutoplayDialog={() => setShowAutoplayDialog(true)}
-      />
+        />
+      </div>
 
       {/* Autoplay Dialog */}
       <AutoplayDialog
@@ -762,6 +880,15 @@ export function SlotMachine() {
         selectedSymbol={pendingFeatureSymbol}
         freeSpinsCount={pendingFreeSpinsCount}
       />
+
+      {/* Win Animation */}
+      {winningFeedback && (
+        <WinAnimation
+          feedback={winningFeedback}
+          onAnimationComplete={handleWinAnimationComplete}
+          onCountComplete={handleWinCountComplete}
+        />
+      )}
     </>
   );
 }

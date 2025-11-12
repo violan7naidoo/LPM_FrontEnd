@@ -115,7 +115,7 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
   return (
     <div className="flex items-center justify-center w-full h-full relative">
       {/* Left side payline numbers */}
-      <div className="absolute left-0 top-0 bottom-0 w-8 flex flex-col justify-between items-center z-10">
+      <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-14 md:w-16 flex flex-col justify-between items-center z-10">
         {paylineNumbers.map((number) => {
           const paylineIndex = number - 1;
           const isActive = activePaylines.includes(paylineIndex);
@@ -140,24 +140,24 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
           const leftOffset = getOffset(paylineIndex, leftGroup, true);
           
           // Ensure the final position stays within bounds by clamping the offset
-          // The number is 24px tall (h-6 = 1.5rem = 24px), so we need at least 12px from top/bottom
+          // The number is now larger (w-10 h-10 = 40px, md:w-14 md:h-14 = 56px), so we need more space
           // With edgePadding of 12%, we have more space, but still clamp offset to be safe
           // Reduce max offset when we're at the edges (row 0 or row 2)
           const isAtEdge = leftRowIndex === 0 || leftRowIndex === numRows - 1;
-          const maxOffsetFromEdge = isAtEdge ? 20 : 30; // Less offset at edges, more in middle
+          const maxOffsetFromEdge = isAtEdge ? 30 : 40; // Less offset at edges, more in middle
           const clampedLeftOffset = Math.max(-maxOffsetFromEdge, Math.min(leftOffset, maxOffsetFromEdge));
           
           return (
             <div
               key={`left-${number}`}
               className={cn(
-                "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 absolute",
-                isActive ? "text-white shadow-lg animate-pulse" : paylineIndex < numPaylines ? "bg-black/50 text-muted-foreground border border-primary/30" : "bg-black/20 text-muted-foreground/50 border border-primary/10 opacity-50"
+                "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-base sm:text-lg md:text-xl font-bold transition-all duration-300 absolute",
+                isActive ? "text-white shadow-lg animate-pulse" : paylineIndex < numPaylines ? "bg-black/50 text-muted-foreground border-2 border-primary/30" : "bg-black/20 text-muted-foreground/50 border-2 border-primary/10 opacity-50"
               )}
               style={{
                 ...(isActive ? {
                   backgroundColor: paylineColor,
-                  boxShadow: `0 0 10px ${paylineColor}50, 0 0 20px ${paylineColor}30`
+                  boxShadow: `0 0 15px ${paylineColor}50, 0 0 30px ${paylineColor}30`
                 } : {}),
                 top: leftPosition,
                 transform: `translateY(calc(-50% + ${clampedLeftOffset}px))`
@@ -175,7 +175,7 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
       </div>
 
       {/* Right side payline numbers */}
-      <div className="absolute right-0 top-0 bottom-0 w-8 flex flex-col justify-between items-center z-10">
+      <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-14 md:w-16 flex flex-col justify-between items-center z-10">
         {paylineNumbers.map((number) => {
           const paylineIndex = number - 1;
           const isActive = activePaylines.includes(paylineIndex);
@@ -200,22 +200,23 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
           const rightOffset = getOffset(paylineIndex, rightGroup, false);
           
           // Ensure the final position stays within bounds by clamping the offset
+          // The number is now larger (w-10 h-10 = 40px, md:w-14 md:h-14 = 56px), so we need more space
           // Reduce max offset when we're at the edges (row 0 or row 2)
           const isAtEdge = rightRowIndex === 0 || rightRowIndex === numRows - 1;
-          const maxOffsetFromEdge = isAtEdge ? 20 : 30; // Less offset at edges, more in middle
+          const maxOffsetFromEdge = isAtEdge ? 30 : 40; // Less offset at edges, more in middle
           const clampedRightOffset = Math.max(-maxOffsetFromEdge, Math.min(rightOffset, maxOffsetFromEdge));
           
           return (
             <div
               key={`right-${number}`}
               className={cn(
-                "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 absolute",
-                isActive ? "text-white shadow-lg animate-pulse" : paylineIndex < numPaylines ? "bg-black/50 text-muted-foreground border border-primary/30" : "bg-black/20 text-muted-foreground/50 border border-primary/10 opacity-50"
+                "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-base sm:text-lg md:text-xl font-bold transition-all duration-300 absolute",
+                isActive ? "text-white shadow-lg animate-pulse" : paylineIndex < numPaylines ? "bg-black/50 text-muted-foreground border-2 border-primary/30" : "bg-black/20 text-muted-foreground/50 border-2 border-primary/10 opacity-50"
               )}
               style={{
                 ...(isActive ? {
                   backgroundColor: paylineColor,
-                  boxShadow: `0 0 10px ${paylineColor}50, 0 0 20px ${paylineColor}30`
+                  boxShadow: `0 0 15px ${paylineColor}50, 0 0 30px ${paylineColor}30`
                 } : {}),
                 top: rightPosition,
                 transform: `translateY(calc(-50% + ${clampedRightOffset}px))`

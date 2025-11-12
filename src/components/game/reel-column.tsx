@@ -36,37 +36,19 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
         }
     }, [shouldBounce, isTurboMode, isSpinning]);
 
-    // Calculate dynamic height based on numRows and window size
+    // Calculate dynamic height based on numRows and fixed symbol size for 1080px layout
+    // Fixed layout: 1080px wide container, 5 reels
+    // Symbol size: ~196px (calculated to fit 1080px with padding and gaps)
     useEffect(() => {
-        // Symbol sizes doubled (2x ratio): h-24 (96px), sm:h-40 (160px), md:h-72 (288px)
-        // Gap: gap-4 (16px) - doubled for proportion
-        // Formula: (numRows * symbolHeight) + ((numRows - 1) * gap)
-        const symbolHeightMobile = 96; // h-24 (2x of h-12)
-        const symbolHeightSmall = 160; // sm:h-40 (2x of sm:h-20)
-        const symbolHeightMedium = 280; // md:h-72 (2x of md:h-36)
-        const gap = 16; // gap-4 (2x of gap-2)
+        // Fixed symbol size for vertical cabinet layout (1080px wide)
+        // Calculation: (1080px - 32px padding - 64px gaps) / 5 reels = 196.8px per symbol
+        const symbolHeightFixed = 196; // Fixed size for 1080px layout
+        const gap = 16; // gap-4
+        const borderPadding = 8; // Extra padding for borders (4px border + 4px margin)
         
-        const updateHeight = () => {
-            const width = window.innerWidth;
-            let height: number;
-            
-            if (width >= 768) {
-                // Medium breakpoint (md)
-                height = (numRows * symbolHeightMedium) + ((numRows - 1) * gap);
-            } else if (width >= 640) {
-                // Small breakpoint (sm)
-                height = (numRows * symbolHeightSmall) + ((numRows - 1) * gap);
-            } else {
-                // Mobile
-                height = (numRows * symbolHeightMobile) + ((numRows - 1) * gap);
-            }
-            
-            setContainerHeight(height);
-        };
-
-        updateHeight();
-        window.addEventListener('resize', updateHeight);
-        return () => window.removeEventListener('resize', updateHeight);
+        // Fixed height calculation for vertical cabinet
+        const height = (numRows * symbolHeightFixed) + ((numRows - 1) * gap) + borderPadding;
+        setContainerHeight(height);
     }, [numRows]);
 
     // Duplicate once for seamless loop without extra work
@@ -90,6 +72,7 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
                 style={{
                     animationDuration: isSpinning ? `3s` : undefined,
                     transformOrigin: isExpanding ? 'center center' : undefined,
+                    minHeight: containerHeight > 0 ? `${containerHeight}px` : 'auto',
                 } as React.CSSProperties}
             >
                 {displaySymbols && displaySymbols.length > 0 
@@ -97,7 +80,7 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
                     <SymbolDisplay 
                         key={i} 
                         symbolId={symbolId} 
-                        className="h-24 w-24 sm:h-40 sm:w-40 md:h-72 md:w-72"
+                        className="w-[196px] h-[196px] flex-shrink-0"
                         winningLineIndices={isExpanded ? [] : winningLineIndicesForColumn[i]} // Don't show winning line highlights if entire reel is expanded
                         isExpandedReel={isExpanded} // Pass flag to show yellow border
                     />

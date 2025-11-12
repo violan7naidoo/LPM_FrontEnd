@@ -64,9 +64,9 @@ export function SymbolDisplay({ symbolId, className, winningLineIndices = [], is
           src={symbol.image} 
           alt={symbolId.toLowerCase()} 
           fill
-          sizes="(max-width: 640px) 48px, (max-width: 768px) 80px, 144px"
+          sizes="196px"
           className={cn(
-            "object-cover drop-shadow-lg transition-opacity duration-300",
+            "object-contain drop-shadow-lg transition-opacity duration-300",
             // If animation is playing, the image is hidden; otherwise, it's visible.
             hasAnimation ? 'opacity-0' : 'opacity-100'
           )}

@@ -78,19 +78,41 @@
   * {
     @apply border-border;
   }
+  html, body {
+    min-height: 100vh;
+    background-color: #000000;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
   body {
-    @apply bg-background text-foreground relative min-h-screen;
-    background-image: url('/images/backround/bg.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: scroll;
-    background-repeat: no-repeat;
+    @apply bg-background text-foreground relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   #__next {
     position: relative;
     z-index: 1;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+}
+
+.game-container {
+  width: 1080px;
+  height: 1920px;
+  margin: auto;
+  background: url('/images/backround/bg.png') no-repeat center center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
 .control-panel-card {

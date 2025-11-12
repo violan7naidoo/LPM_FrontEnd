@@ -52,11 +52,18 @@ export function ImageSequenceAnimation({
       lastFrameRef.current = 1;
       
       // Small delay to ensure smooth start
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         startTimeRef.current = performance.now();
         setIsReady(true);
         animationRef.current = requestAnimationFrame(animate);
       }, 16); // One frame delay
+      
+      return () => {
+        clearTimeout(timeoutId);
+        if (animationRef.current) {
+          cancelAnimationFrame(animationRef.current);
+        }
+      };
     } else if (!isPlaying && isAnimating) {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -72,7 +79,8 @@ export function ImageSequenceAnimation({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [isPlaying, animate, isAnimating]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying]); // Only depend on isPlaying to prevent infinite loops
   
   // Generate the image path for the current frame
   const getImagePath = (frame: number) => {

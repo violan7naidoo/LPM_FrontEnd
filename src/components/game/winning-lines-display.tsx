@@ -9,23 +9,23 @@ export const PAYLINE_COLORS = [
 
 interface WinningLinesDisplayProps {
   winningLines: WinningLine[];
-  expandedReels?: number[]; // For feature games: only draw lines on these reels
 }
 
-const SYMBOL_WIDTH_MD = 144; // w-36
-const SYMBOL_HEIGHT_MD = 144; // h-36
-const GAP_MD = 8; // md:gap-2
-const PADDING_MD = 8; // md:p-2
+// Fixed sizes for 1080px vertical cabinet layout
+const SYMBOL_WIDTH_MD = 196; // Fixed size for 1080px layout
+const SYMBOL_HEIGHT_MD = 196; // Fixed size for 1080px layout
+const GAP_MD = 16; // gap-4
+const PADDING_MD = 16; // p-4
 
-const SYMBOL_WIDTH_SM = 80; // sm:w-20
-const SYMBOL_HEIGHT_SM = 80; // sm:h-20
-const GAP_SM = 8; // sm:gap-2
-const PADDING_SM = 8; // sm:p-2
+const SYMBOL_WIDTH_SM = 196; // Same for all breakpoints in fixed layout
+const SYMBOL_HEIGHT_SM = 196;
+const GAP_SM = 16;
+const PADDING_SM = 16;
 
-const SYMBOL_WIDTH_XS = 48; // h-12 w-12 on smallest
-const SYMBOL_HEIGHT_XS = 48; // h-12 w-12 on smallest
-const GAP_XS = 8; // gap-2 on smallest
-const PADDING_XS = 8; // p-2 on smallest
+const SYMBOL_WIDTH_XS = 196; // Same for all breakpoints in fixed layout
+const SYMBOL_HEIGHT_XS = 196;
+const GAP_XS = 16;
+const PADDING_XS = 16;
 
 
 const getPointForCell = (reel: number, row: number, screen: 'xs' | 'sm' | 'md') => {
@@ -58,12 +58,10 @@ const getPointForCell = (reel: number, row: number, screen: 'xs' | 'sm' | 'md') 
   return { x, y };
 };
 
-const getPathForLine = (line: number[], screen: 'xs' | 'sm' | 'md', expandedReels: number[] = []) => {
-  // If expanded reels are specified (feature game), only include points for those reels
+const getPathForLine = (line: number[], screen: 'xs' | 'sm' | 'md') => {
+  // Draw lines across the entire grid (all reels)
   const points = line
-    .map((row, reel) => ({ row, reel, point: getPointForCell(reel, row, screen) }))
-    .filter(({ reel }) => expandedReels.length === 0 || expandedReels.includes(reel))
-    .map(({ point }) => point);
+    .map((row, reel) => getPointForCell(reel, row, screen));
   
   if (points.length === 0) return '';
   
@@ -100,7 +98,7 @@ const getViewBox = (screen: 'xs' | 'sm' | 'md', numReels: number, numRows: numbe
 }
 
 
-export function WinningLinesDisplay({ winningLines, expandedReels = [] }: WinningLinesDisplayProps) {
+export function WinningLinesDisplay({ winningLines }: WinningLinesDisplayProps) {
   const paylines = usePaylines();
   const numReels = useNumReels();
   const numRows = useNumRows();
@@ -115,7 +113,7 @@ export function WinningLinesDisplay({ winningLines, expandedReels = [] }: Winnin
       >
         {winningLines.map((line) => {
           if (line.paylineIndex < 0 || line.paylineIndex >= paylines.length) return null;
-          const path = getPathForLine(paylines[line.paylineIndex], 'md', expandedReels);
+          const path = getPathForLine(paylines[line.paylineIndex], 'md');
           if (!path) return null; // Skip if no path (all points filtered out)
           return (
             <path
@@ -141,7 +139,7 @@ export function WinningLinesDisplay({ winningLines, expandedReels = [] }: Winnin
       >
         {winningLines.map((line) => {
           if (line.paylineIndex < 0 || line.paylineIndex >= paylines.length) return null;
-          const path = getPathForLine(paylines[line.paylineIndex], 'sm', expandedReels);
+          const path = getPathForLine(paylines[line.paylineIndex], 'sm');
           if (!path) return null; // Skip if no path (all points filtered out)
           return (
             <path
@@ -167,7 +165,7 @@ export function WinningLinesDisplay({ winningLines, expandedReels = [] }: Winnin
       >
         {winningLines.map((line) => {
           if (line.paylineIndex < 0 || line.paylineIndex >= paylines.length) return null;
-          const path = getPathForLine(paylines[line.paylineIndex], 'xs', expandedReels);
+          const path = getPathForLine(paylines[line.paylineIndex], 'xs');
           if (!path) return null; // Skip if no path (all points filtered out)
           return (
             <path

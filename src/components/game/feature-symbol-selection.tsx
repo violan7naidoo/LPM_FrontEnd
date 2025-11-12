@@ -24,38 +24,45 @@ export function FeatureSymbolSelection({
 
   useEffect(() => {
     if (isOpen && config) {
-      // Get all eligible symbols (excluding scatter and low-value cards)
+      // Get all eligible symbols (excluding only Scatter - all other 9 symbols are eligible)
       const eligibleSymbols = Object.keys(config.symbols).filter(
-        s => s !== 'Scatter' && s !== 'A' && s !== 'K' && s !== 'Q' && s !== 'J' && s !== '10'
+        s => s !== 'Scatter'
       );
       
       // Start animation
       setShowAnimation(true);
       setShowSymbol(false);
       
-      // Spin through symbols quickly
+      // Cycle through all symbols in order, then stop on selected symbol
+      let currentIndex = 0;
       let spinCount = 0;
+      const totalSpins = 30; // Double the spins (was 15)
+      const selectedSymbolIndex = eligibleSymbols.indexOf(selectedSymbol);
+      
       const spinInterval = setInterval(() => {
-        const randomSymbols = Array.from({ length: 3 }, () => 
-          eligibleSymbols[Math.floor(Math.random() * eligibleSymbols.length)]
-        );
-        setSpinningSymbols(randomSymbols);
+        // Cycle through all eligible symbols in order
+        const currentSymbol = eligibleSymbols[currentIndex % eligibleSymbols.length];
+        setSpinningSymbols([currentSymbol]); // Show only one icon
+        currentIndex++;
         spinCount++;
         
-        if (spinCount >= 15) {
+        // Stop when we've done enough spins
+        if (spinCount >= totalSpins) {
           clearInterval(spinInterval);
-          // Slow down and show selected symbol
+          
+          // Stop cycling and show the selected symbol
+          setSpinningSymbols([selectedSymbol]);
+          
+          // Brief pause to show the selected symbol stopped, then reveal with animation
           setTimeout(() => {
-            setSpinningSymbols([selectedSymbol, selectedSymbol, selectedSymbol]);
+            setShowAnimation(false); // Stop the spinning animation
+            setShowSymbol(true); // This triggers the scale-in and pulse-glow animations
             setTimeout(() => {
-              setShowSymbol(true);
-              setTimeout(() => {
-                onComplete();
-              }, 1500);
-            }, 500);
-          }, 300);
+              onComplete();
+            }, 3000); // Display time after selection animation
+          }, 500);
         }
-      }, 100);
+      }, 100); // Keep same interval speed
       
       return () => clearInterval(spinInterval);
     }
@@ -70,32 +77,55 @@ export function FeatureSymbolSelection({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="relative flex flex-col items-center justify-center p-8 bg-gradient-to-br from-yellow-900/90 to-yellow-700/90 rounded-2xl border-4 border-yellow-400 shadow-2xl max-w-md w-full mx-4">
-        <h2 className="text-3xl font-bold text-yellow-200 mb-4 uppercase tracking-wider text-center">
+      <div className="relative flex flex-col items-center justify-center p-8 sm:p-12 bg-gradient-to-br from-yellow-900/90 to-yellow-700/90 rounded-2xl border-4 border-yellow-400 shadow-2xl max-w-2xl w-full mx-4">
+        <h2 className="text-4xl sm:text-5xl font-bold text-yellow-200 mb-6 uppercase tracking-wider text-center">
           Free Spins!
         </h2>
-        <p className="text-xl text-yellow-100 mb-6 text-center">
+        <p className="text-2xl sm:text-3xl text-yellow-100 mb-8 text-center">
           {freeSpinsCount} Free Spins Awarded
         </p>
         
         <div className="mb-6">
-          <p className="text-lg text-yellow-200 mb-4 text-center">
+          <p className="text-xl sm:text-2xl text-yellow-200 mb-6 text-center">
             Selecting Feature Symbol...
           </p>
           
-          {showAnimation && !showSymbol && (
-            <div className="flex items-center justify-center gap-4">
+          {showAnimation && !showSymbol && spinningSymbols.length > 0 && (
+            <div className="flex items-center justify-center">
               {spinningSymbols.map((symbol, index) => (
                 <div
                   key={index}
-                  className="relative w-24 h-24 bg-white/20 rounded-lg border-2 border-yellow-400 flex items-center justify-center animate-pulse"
+                  className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 bg-white/20 rounded-lg border-4 border-yellow-400 flex items-center justify-center animate-pulse shadow-2xl transition-all duration-100"
                 >
                   {symbol && (
                     <Image
                       src={getSymbolImage(symbol)}
                       alt={symbol}
-                      width={80}
-                      height={80}
+                      width={200}
+                      height={200}
+                      className="object-contain"
+                      unoptimized
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* Show selected symbol when stopped but before reveal animation */}
+          {!showAnimation && !showSymbol && spinningSymbols.length > 0 && (
+            <div className="flex items-center justify-center">
+              {spinningSymbols.map((symbol, index) => (
+                <div
+                  key={index}
+                  className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 bg-white/20 rounded-lg border-4 border-yellow-400 flex items-center justify-center shadow-2xl"
+                >
+                  {symbol && (
+                    <Image
+                      src={getSymbolImage(symbol)}
+                      alt={symbol}
+                      width={200}
+                      height={200}
                       className="object-contain"
                       unoptimized
                     />
@@ -106,21 +136,21 @@ export function FeatureSymbolSelection({
           )}
           
           {showSymbol && (
-            <div className="flex flex-col items-center justify-center animate-scale-in">
-              <p className="text-xl text-yellow-200 mb-4 text-center">
+            <div className="flex flex-col items-center justify-center">
+              <p className="text-2xl sm:text-3xl text-yellow-200 mb-6 text-center animate-fade-in">
                 Feature Symbol Selected:
               </p>
-              <div className="relative w-32 h-32 bg-white/30 rounded-lg border-4 border-yellow-400 flex items-center justify-center shadow-2xl">
+              <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 bg-white/30 rounded-lg border-4 border-yellow-400 flex items-center justify-center shadow-2xl animate-scale-in animate-pulse-glow">
                 <Image
                   src={getSymbolImage(selectedSymbol)}
                   alt={selectedSymbol}
-                  width={120}
-                  height={120}
+                  width={200}
+                  height={200}
                   className="object-contain"
                   unoptimized
                 />
               </div>
-              <p className="text-2xl font-bold text-yellow-200 mt-4 uppercase">
+              <p className="text-3xl sm:text-4xl font-bold text-yellow-200 mt-6 uppercase animate-fade-in">
                 {selectedSymbol}
               </p>
             </div>
