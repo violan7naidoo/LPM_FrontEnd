@@ -115,7 +115,7 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
   return (
     <div className="flex items-center justify-center w-full h-full relative">
       {/* Left side payline numbers */}
-      <div className="absolute left-0 top-0 bottom-0 w-12 sm:w-14 md:w-16 flex flex-col justify-between items-center z-10">
+      <div className="absolute -left-4 sm:-left-6 md:-left-8 top-0 bottom-0 w-12 sm:w-14 md:w-16 flex flex-col justify-between items-center z-10">
         {paylineNumbers.map((number) => {
           const paylineIndex = number - 1;
           const isActive = activePaylines.includes(paylineIndex);
@@ -175,7 +175,7 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
       </div>
 
       {/* Right side payline numbers */}
-      <div className="absolute right-0 top-0 bottom-0 w-12 sm:w-14 md:w-16 flex flex-col justify-between items-center z-10">
+      <div className="absolute -right-4 sm:-right-6 md:-right-8 top-0 bottom-0 w-12 sm:w-14 md:w-16 flex flex-col justify-between items-center z-10">
         {paylineNumbers.map((number) => {
           const paylineIndex = number - 1;
           const isActive = activePaylines.includes(paylineIndex);
