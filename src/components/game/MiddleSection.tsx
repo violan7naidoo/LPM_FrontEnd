@@ -176,15 +176,54 @@ export function MiddleSection({ betAmount }: MiddleSectionProps) {
       }}
     >
       <div className="grid grid-cols-2 gap-x-12 gap-y-6 max-w-6xl w-full relative">
-        {/* Row 1 (Top): Scatter on left, SUBSTITUTES FOR on right */}
-        <PayCell
-          symbolId={scatterSymbol}
-          betKey={betKey}
-          config={config}
-          hidePayouts={[2]}
-        />
-        <div className="flex items-center justify-end">
-          <div className="bg-black/40 rounded-lg p-6 border-4 border-yellow-400/50">
+        {/* Row 1 (Top): Scatter and SUBSTITUTES FOR in one long block */}
+        <div className="col-span-2 bg-black/40 rounded-lg p-6 border-4 border-yellow-400/50">
+          <div className="flex items-center justify-between gap-8">
+            {/* Scatter section on left */}
+            <div className="flex items-center gap-8">
+              {(() => {
+                const symbol = config?.symbols?.[scatterSymbol];
+                if (!symbol) return null;
+                const payouts = symbol.payout?.[betKey] || {};
+                const actionGames = symbol.actionGames?.[betKey] || {};
+                const formatPayout = (count: number) => {
+                  if (count === 2) return null;
+                  const countKey = count.toString();
+                  const pay = payouts[countKey] || 0;
+                  const ag = actionGames[countKey] || 0;
+                  return (
+                    <p key={count} className="text-white text-xl leading-tight">
+                      {count}x{' '}
+                      <span className="text-yellow-400 font-bold">
+                        {pay.toFixed(2)}
+                      </span>
+                      {ag > 0 && (
+                        <span className="text-red-500 font-bold">
+                          {' '}+ {ag}AG
+                        </span>
+                      )}
+                    </p>
+                  );
+                };
+                return (
+                  <>
+                    <Image
+                      src={symbol.image}
+                      alt={symbol.name}
+                      width={160}
+                      height={160}
+                      className="object-contain w-40 h-40"
+                    />
+                    <div className="text-2xl font-bold leading-tight text-white">
+                      {formatPayout(5)}
+                      {formatPayout(4)}
+                      {formatPayout(3)}
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+            {/* SUBSTITUTES FOR section on right */}
             <div className="flex flex-col gap-4 items-end">
               <p className="text-white font-bold text-2xl">SUBSTITUTES FOR</p>
               <div className="flex gap-2">
@@ -224,15 +263,23 @@ export function MiddleSection({ betAmount }: MiddleSectionProps) {
         </div>
 
         {/* Row 2: Queen on left, Stone on right */}
-        <PayCell symbolId={queenSymbol} betKey={betKey} config={config} />
+        <div className="w-fit">
+          <PayCell symbolId={queenSymbol} betKey={betKey} config={config} />
+        </div>
         <div className="flex justify-end">
-          <PayCell symbolId={stoneSymbol} betKey={betKey} config={config} />
+          <div className="w-fit">
+            <PayCell symbolId={stoneSymbol} betKey={betKey} config={config} />
+          </div>
         </div>
 
         {/* Row 3: Wolf on left, Leopard on right */}
-        <PayCell symbolId={wolfSymbol} betKey={betKey} config={config} />
+        <div className="w-fit">
+          <PayCell symbolId={wolfSymbol} betKey={betKey} config={config} />
+        </div>
         <div className="flex justify-end">
-          <PayCell symbolId={leopardSymbol} betKey={betKey} config={config} />
+          <div className="w-fit">
+            <PayCell symbolId={leopardSymbol} betKey={betKey} config={config} />
+          </div>
         </div>
 
         {/* Row 4 (Bottom): A, K on left, Q, J, 10 on right */}
@@ -250,7 +297,7 @@ export function MiddleSection({ betAmount }: MiddleSectionProps) {
         </div>
 
         {/* Center Feature: 10 PENNY GAMES + SPECIAL EXPANDING SYMBOL */}
-        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50">
+        <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[350px]">
           <p className="text-yellow-400 font-bold text-2xl">10 PENNY GAMES</p>
           <p className="text-yellow-400 font-bold text-2xl">+</p>
           <p className="text-yellow-400 font-bold text-xl">SPECIAL EXPANDING SYMBOL</p>
