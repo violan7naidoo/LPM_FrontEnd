@@ -14,17 +14,17 @@ interface WinningLinesDisplayProps {
 // Fixed sizes for 1080px vertical cabinet layout
 const SYMBOL_WIDTH_MD = 196; // Fixed size for 1080px layout
 const SYMBOL_HEIGHT_MD = 196; // Fixed size for 1080px layout
-const GAP_MD = 16; // gap-4
+const GAP_MD = 4; // gap-1 (reduced from gap-4 to make borders visible)
 const PADDING_MD = 16; // p-4
 
 const SYMBOL_WIDTH_SM = 196; // Same for all breakpoints in fixed layout
 const SYMBOL_HEIGHT_SM = 196;
-const GAP_SM = 16;
+const GAP_SM = 4; // gap-1 (reduced from gap-4 to make borders visible)
 const PADDING_SM = 16;
 
 const SYMBOL_WIDTH_XS = 196; // Same for all breakpoints in fixed layout
 const SYMBOL_HEIGHT_XS = 196;
-const GAP_XS = 16;
+const GAP_XS = 4; // gap-1 (reduced from gap-4 to make borders visible)
 const PADDING_XS = 16;
 
 

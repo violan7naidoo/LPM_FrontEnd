@@ -47,10 +47,10 @@ interface ControlPanelProps {
 }
 
 const InfoDisplay = ({ label, value, isCurrency = true }: { label: string; value: number | string; isCurrency?: boolean }) => (
-    <div className="flex flex-col items-center justify-center p-2 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
-        <span className="text-xs sm:text-sm md:text-base uppercase font-mono tracking-widest subtle-cyan-text">{label}</span>
-        <span className="text-lg sm:text-xl md:text-2xl font-bold font-mono cyan-text-glow">
-            {isCurrency ? `R ${value}` : value}
+    <div className="flex flex-col items-center justify-center p-3 md:p-4 lg:p-5 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
+        <span className="text-base md:text-lg uppercase font-mono tracking-widest subtle-cyan-text mb-1">{label}</span>
+        <span className="text-2xl md:text-3xl font-bold font-mono cyan-text-glow leading-none">
+            {isCurrency ? `R${value}` : value}
         </span>
     </div>
 );
@@ -60,7 +60,7 @@ const MobileInfoDisplay = ({ label, value, isCurrency = true }: { label: string;
     <div className="flex flex-col items-center justify-center p-1 rounded-md w-full text-center min-h-[48px] info-display-bg">
         <span className="text-[10px] uppercase font-mono tracking-widest subtle-cyan-text">{label}</span>
         <span className="text-base font-bold font-mono cyan-text-glow">
-            {isCurrency ? `R ${value}` : value}
+            {isCurrency ? `R${value}` : value}
         </span>
     </div>
 );
@@ -121,25 +121,25 @@ export function ControlPanel({
   const isButtonDisabled = isSpinning || (balance < totalBet && !isFreeSpinsMode && actionGameSpins === 0);
 
   return (
-    <Card className="w-full p-2 md:p-4 shadow-2xl control-panel-card backdrop-blur">
+    <Card className="w-full p-4 md:p-6 lg:p-8 shadow-2xl control-panel-card backdrop-blur">
         {/* Desktop layout - single horizontal line */}
-        <div className="hidden sm:flex items-center justify-between gap-2 h-full min-h-[80px] md:min-h-[100px]">
+        <div className="hidden sm:flex items-center justify-between gap-2 h-full min-h-[120px] md:min-h-[140px] lg:min-h-[160px]">
             {/* Balance */}
             <InfoDisplay label="Balance" value={balance.toFixed(2)} />
             
             {/* Bet Amount */}
             {!isFreeSpinsMode && (
-                <div className="flex flex-col items-center justify-center p-2 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
-                    <span className="text-xs sm:text-sm md:text-base uppercase font-mono tracking-widest subtle-cyan-text">Bet</span>
-                    <div className="flex items-center gap-1 justify-center w-full mt-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 md:h-9 md:w-9 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
-                            <Minus className="h-5 w-5 md:h-6 md:w-6" />
-                        </Button>
-                        <span className="text-lg md:text-xl font-bold font-mono px-1 cyan-text-glow">
-                            R {betPerPayline.toFixed(2)}
-                        </span>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 md:h-9 md:w-9 hover:text-cyan-200 bet-button-icon" onClick={onIncreaseBet} disabled={isSpinning}>
+                <div className="flex flex-col items-center justify-center p-3 md:p-4 lg:p-5 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
+                    <span className="text-base md:text-lg uppercase font-mono tracking-widest subtle-cyan-text mb-1">Bet</span>
+                    <div className="flex items-center gap-1 justify-center w-full">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10 hover:text-cyan-200 bet-button-icon" onClick={onIncreaseBet} disabled={isSpinning}>
                             <Plus className="h-5 w-5 md:h-6 md:w-6" />
+                        </Button>
+                        <span className="text-2xl md:text-3xl font-bold font-mono px-1 cyan-text-glow leading-none">
+                            R{betPerPayline.toFixed(2)}
+                        </span>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 md:h-10 md:w-10 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
+                            <Minus className="h-5 w-5 md:h-6 md:w-6" />
                         </Button>
                     </div>
                 </div>
@@ -148,9 +148,9 @@ export function ControlPanel({
                 <>
                     <InfoDisplay label="Free Spins" value={freeSpinsRemaining} isCurrency={false} />
                     {featureSymbol && (
-                        <div className="flex flex-col items-center justify-center p-2 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
-                            <span className="text-xs sm:text-sm md:text-base uppercase font-mono tracking-widest subtle-cyan-text">Expanding Symbol</span>
-                            <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mt-1">
+                        <div className="flex flex-col items-center justify-center p-3 md:p-4 lg:p-5 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
+                            <span className="text-base md:text-lg uppercase font-mono tracking-widest subtle-cyan-text mb-1">Expanding Symbol</span>
+                            <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32">
                                 {featureSymbolImage ? (
                                     <Image
                                         src={featureSymbolImage}
@@ -177,7 +177,7 @@ export function ControlPanel({
             <Button
                 onClick={onToggleTurbo}
                 className={`
-                    relative w-14 h-14 md:w-20 md:h-20 rounded-full
+                    relative w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full
                     flex items-center justify-center p-0
                     text-white transition-all duration-300 ease-in-out
                     shadow-xl transform active:scale-95
@@ -201,7 +201,7 @@ export function ControlPanel({
                 onClick={onSpin}
                 disabled={isButtonDisabled}
                 className={`
-                    relative w-20 h-20 md:w-28 md:h-28 rounded-full
+                    relative w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-full
                     flex items-center justify-center p-0
                     transition-all duration-300 ease-in-out
                     shadow-xl transform active:scale-95
@@ -212,7 +212,7 @@ export function ControlPanel({
                 `}
             >
                 {isSpinning ? (
-                    <RotateCw className="w-12 h-12 md:w-16 md:h-16 animate-spin-slow text-white absolute z-10" />
+                    <RotateCw className="w-14 h-14 md:w-18 md:h-18 lg:w-20 lg:h-20 animate-spin-slow text-white absolute z-10" />
                 ) : (
                     <Image
                         src="/Control_Panel/spin_btn.png"
@@ -229,7 +229,7 @@ export function ControlPanel({
                 <Button
                     onClick={autoplayState.isActive ? onStopAutoplay : onShowAutoplayDialog}
                     className={`
-                        relative w-14 h-14 md:w-20 md:h-20 rounded-full
+                        relative w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full
                         flex items-center justify-center p-0
                         text-white transition-all duration-300 ease-in-out
                         shadow-xl transform active:scale-95
@@ -253,7 +253,7 @@ export function ControlPanel({
             <InfoDisplay label="Win" value={lastWin.toFixed(2)} />
         
             {/* Pay Table, Info, and Audio Settings */}
-            <div className="flex items-center justify-center gap-2 p-2 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
+            <div className="flex items-center justify-center gap-2 p-3 md:p-4 lg:p-5 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
                 <PayTableDialog betPerPayline={betPerPayline} totalBet={totalBet} />
                 <InfoDialog />
                 <AudioSettingsDialog 
@@ -359,14 +359,14 @@ export function ControlPanel({
                             <div className="flex flex-col items-center justify-center p-1 rounded-md text-center min-h-[48px] info-display-bg">
                                 <span className="text-[8px] uppercase font-mono tracking-widest subtle-cyan-text">Bet</span>
                                 <div className="flex items-center gap-0.5 justify-center w-full mt-0.5">
-                                    <Button variant="ghost" size="icon" className="h-4 w-4 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
-                                        <Minus className="h-3 w-3" />
-                                    </Button>
-                                    <span className="text-sm font-bold font-mono px-1 cyan-text-glow">
-                                        R {betPerPayline.toFixed(2)}
-                                    </span>
                                     <Button variant="ghost" size="icon" className="h-4 w-4 hover:text-cyan-200 bet-button-icon" onClick={onIncreaseBet} disabled={isSpinning}>
                                         <Plus className="h-3 w-3" />
+                                    </Button>
+                                    <span className="text-sm font-bold font-mono px-1 cyan-text-glow">
+                                        R{betPerPayline.toFixed(2)}
+                                    </span>
+                                    <Button variant="ghost" size="icon" className="h-4 w-4 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
+                                        <Minus className="h-3 w-3" />
                                     </Button>
                                 </div>
                             </div>

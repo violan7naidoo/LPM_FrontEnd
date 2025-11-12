@@ -41,9 +41,9 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
     // Symbol size: ~196px (calculated to fit 1080px with padding and gaps)
     useEffect(() => {
         // Fixed symbol size for vertical cabinet layout (1080px wide)
-        // Calculation: (1080px - 32px padding - 64px gaps) / 5 reels = 196.8px per symbol
+        // Calculation: (1080px - 32px padding - 16px gaps) / 5 reels = 206.4px per symbol
         const symbolHeightFixed = 196; // Fixed size for 1080px layout
-        const gap = 16; // gap-4
+        const gap = 4; // gap-1 (reduced from gap-4 to make borders visible)
         const borderPadding = 8; // Extra padding for borders (4px border + 4px margin)
         
         // Fixed height calculation for vertical cabinet
@@ -59,12 +59,12 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
 
     return (
         <div 
-            className="overflow-hidden contain-paint"
+            className="overflow-visible contain-paint"
             style={{ height: containerHeight > 0 ? `${containerHeight}px` : 'auto' }}
         >
             <div
                 className={cn(
-                    'flex flex-col gap-4 transform-gpu will-change-transform relative',
+                    'flex flex-col gap-1 transform-gpu will-change-transform relative',
                     isSpinning && 'animate-reel-spin',
                     isStopping && 'animate-reel-bounce',
                     isExpanding && 'animate-expand-reel'

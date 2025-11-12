@@ -792,7 +792,7 @@ export function SlotMachine() {
               numPaylines={numPaylines}
             >
               <div 
-                className="grid gap-4 p-4 pb-6 bg-black/30 rounded-lg relative w-full h-full"
+                className="grid gap-1 p-4 pb-6 bg-black/30 rounded-lg relative w-full h-full"
                 style={{ 
                   gridTemplateColumns: `repeat(${numReels}, minmax(0, 1fr))`,
                   maxWidth: '1080px',
