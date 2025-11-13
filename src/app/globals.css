@@ -390,3 +390,28 @@
       0 0 15px rgba(255, 215, 0, 0.5);  /* Far gold glow */
 }
 
+/**
+ * Slot Game Title
+ * 
+ * Fancy styling for the main game title "Snow Kingdom"
+ * Features:
+ * - Blue/cyan gradient to match game theme
+ * - Professional serif font (Playfair Display)
+ * - Multiple layered shadows for depth
+ * - Subtle glow effects
+ * - Letter spacing for elegance
+ */
+.slot-game-title {
+  font-family: 'Playfair Display', serif;
+  background: linear-gradient(135deg, #00aaff 0%, #44ddff 50%, #aaffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 
+    0 0 4px rgba(0, 170, 255, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.15em;
+  position: relative;
+  display: inline-block;
+}
+

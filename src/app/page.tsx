@@ -70,6 +70,13 @@ export default function Home() {
 
   return (
     <div className="game-container">
+      {/* Game Title at the top */}
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-center pt-8 z-20">
+        <h1 className="slot-game-title text-6xl sm:text-7xl md:text-8xl font-bold uppercase tracking-wider text-center">
+          Snow Kingdom
+        </h1>
+      </div>
+      
       <TopSection 
         betAmount={betAmount} 
         isFreeSpinsMode={isFreeSpinsMode}
