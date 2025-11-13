@@ -1,3 +1,26 @@
+/**
+ * AutoplayDialog Component
+ * 
+ * This component provides a settings dialog for configuring autoplay functionality.
+ * Players can set the number of spins and stop conditions for automatic gameplay.
+ * 
+ * Features:
+ * - Number of spins slider (1-1000)
+ * - Stop conditions:
+ *   - Stop on any win
+ *   - Stop if single win exceeds amount
+ *   - Stop on feature (free spins)
+ *   - Stop if total loss exceeds amount
+ * - Currency formatting (ZAR)
+ * - Validation and start button
+ * 
+ * Layout:
+ * - Modal dialog with form controls
+ * - Sliders for numeric values
+ * - Checkboxes for boolean options
+ * - Start button to begin autoplay
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -7,6 +30,17 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { X } from "lucide-react";
 
+/**
+ * AutoplaySettings interface
+ * 
+ * Configuration object for autoplay behavior
+ * 
+ * @param numberOfSpins - Number of spins to execute automatically (1-1000)
+ * @param stopOnAnyWin - Stop autoplay if any win occurs
+ * @param stopOnSingleWinExceeds - Stop if a single win exceeds this amount
+ * @param stopOnFeature - Stop if free spins feature is triggered
+ * @param stopOnTotalLossExceeds - Stop if total loss exceeds this amount
+ */
 interface AutoplaySettings {
   numberOfSpins: number;
   stopOnAnyWin: boolean;
@@ -15,6 +49,15 @@ interface AutoplaySettings {
   stopOnTotalLossExceeds: number;
 }
 
+/**
+ * Props interface for AutoplayDialog component
+ * 
+ * @param isOpen - Whether the dialog is open
+ * @param onClose - Callback to close the dialog
+ * @param onStartAutoplay - Callback to start autoplay with settings
+ * @param currentBalance - Current player balance (for validation)
+ * @param currentBet - Current bet amount (for validation)
+ */
 interface AutoplayDialogProps {
   isOpen: boolean;
   onClose: () => void;

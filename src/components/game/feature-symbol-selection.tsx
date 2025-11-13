@@ -1,9 +1,43 @@
+/**
+ * FeatureSymbolSelection Component
+ * 
+ * This component displays an animated symbol selection screen when free spins are triggered.
+ * It shows a spinning animation that cycles through eligible symbols, then reveals the selected
+ * expanding symbol for the free spins feature.
+ * 
+ * Features:
+ * - Symbol spinning animation (cycles through all eligible symbols)
+ * - 30 spins before stopping on selected symbol
+ * - Reveal animation (scale-in and pulse-glow)
+ * - Free spins count display
+ * - Full-screen overlay with golden theme
+ * 
+ * Animation Flow:
+ * 1. Component opens → symbols start spinning (30 spins)
+ * 2. Symbols cycle through all eligible symbols (excluding Scatter)
+ * 3. Animation stops on selected symbol
+ * 4. Brief pause → reveal animation plays
+ * 5. Symbol displayed for 3 seconds → onComplete callback
+ * 
+ * Eligible Symbols:
+ * - All symbols except Scatter (9 symbols total)
+ * - Scatter cannot be the expanding symbol
+ */
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useGameConfig } from '@/hooks/use-game-config';
 
+/**
+ * Props interface for FeatureSymbolSelection component
+ * 
+ * @param isOpen - Whether the selection screen is visible
+ * @param onComplete - Callback when selection animation completes
+ * @param selectedSymbol - The symbol that was selected as the expanding symbol
+ * @param freeSpinsCount - Number of free spins awarded
+ */
 interface FeatureSymbolSelectionProps {
   isOpen: boolean;
   onComplete: () => void;

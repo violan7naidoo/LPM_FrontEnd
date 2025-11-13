@@ -1,3 +1,24 @@
+/**
+ * ControlPanel Component
+ * 
+ * This component displays the game control panel with bet controls, spin button,
+ * and information displays. It's the main user interface for game interaction.
+ * 
+ * Features:
+ * - Bet amount controls (increase/decrease with circular navigation)
+ * - Spin button (changes text based on game state)
+ * - Balance and win displays
+ * - Turbo mode toggle
+ * - Autoplay controls
+ * - Info dialogs (Pay Table, Game Info, Audio Settings)
+ * - Free spins and action game indicators
+ * - Responsive layout (desktop and mobile)
+ * 
+ * Layout:
+ * - Desktop: Single horizontal row with all controls
+ * - Mobile: Stacked layout with multiple rows
+ */
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PayTableDialog } from "./pay-table-dialog";
@@ -9,6 +30,36 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useGameConfig } from '@/hooks/use-game-config';
 
+/**
+ * Props interface for ControlPanel component
+ * 
+ * @param betPerPayline - Bet amount per payline (calculated from totalBet / numPaylines)
+ * @param numPaylines - Number of active paylines (always 5 in this game)
+ * @param totalBet - Total bet amount (betAmount from parent)
+ * @param balance - Current player balance
+ * @param lastWin - Last win amount from previous spin
+ * @param isSpinning - Whether reels are currently spinning
+ * @param onSpin - Callback function to trigger a spin
+ * @param onIncreaseBet - Callback to increase bet amount (circular)
+ * @param onDecreaseBet - Callback to decrease bet amount (circular)
+ * @param freeSpinsRemaining - Number of free spins remaining
+ * @param isFreeSpinsMode - Whether currently in free spins mode
+ * @param actionGameSpins - Number of action game spins remaining
+ * @param isTurboMode - Whether turbo mode is enabled
+ * @param onToggleTurbo - Callback to toggle turbo mode
+ * @param isMusicEnabled - Whether background music is enabled
+ * @param onToggleMusic - Callback to toggle music
+ * @param isSfxEnabled - Whether sound effects are enabled
+ * @param onToggleSfx - Callback to toggle sound effects
+ * @param volume - Current volume level (0-100)
+ * @param onVolumeChange - Callback to change volume
+ * @param maxPaylines - Maximum number of paylines (from config)
+ * @param featureSymbol - Currently selected feature symbol for free spins
+ * @param autoplayState - Current autoplay state and settings
+ * @param onStartAutoplay - Callback to start autoplay
+ * @param onStopAutoplay - Callback to stop autoplay
+ * @param onShowAutoplayDialog - Callback to show autoplay settings dialog
+ */
 interface ControlPanelProps {
   betPerPayline: number;
   numPaylines: number;
@@ -46,6 +97,16 @@ interface ControlPanelProps {
   onShowAutoplayDialog?: () => void;
 }
 
+/**
+ * InfoDisplay Component
+ * 
+ * Displays a single information item (Balance, Win, Bet, etc.)
+ * Used in the desktop layout of the control panel.
+ * 
+ * @param label - Display label (e.g., "Balance", "Win")
+ * @param value - Value to display (number or string)
+ * @param isCurrency - Whether to format as currency (adds "R" prefix)
+ */
 const InfoDisplay = ({ label, value, isCurrency = true }: { label: string; value: number | string; isCurrency?: boolean }) => (
     <div className="flex flex-col items-center justify-center p-3 md:p-4 lg:p-5 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
         <span className="text-base md:text-lg uppercase font-mono tracking-widest subtle-cyan-text mb-1">{label}</span>
@@ -55,7 +116,16 @@ const InfoDisplay = ({ label, value, isCurrency = true }: { label: string; value
     </div>
 );
 
-// Mobile-specific InfoDisplay with full width
+/**
+ * MobileInfoDisplay Component
+ * 
+ * Mobile-optimized version of InfoDisplay with smaller text and full width.
+ * Used in the mobile layout of the control panel.
+ * 
+ * @param label - Display label (e.g., "Balance", "Win")
+ * @param value - Value to display (number or string)
+ * @param isCurrency - Whether to format as currency (adds "R" prefix)
+ */
 const MobileInfoDisplay = ({ label, value, isCurrency = true }: { label: string; value: number | string; isCurrency?: boolean }) => (
     <div className="flex flex-col items-center justify-center p-1 rounded-md w-full text-center min-h-[48px] info-display-bg">
         <span className="text-[10px] uppercase font-mono tracking-widest subtle-cyan-text">{label}</span>
@@ -95,15 +165,26 @@ export function ControlPanel({
   onStopAutoplay,
   onShowAutoplayDialog,
 }: ControlPanelProps) {
+  // Load game configuration to access symbol images
   const { config } = useGameConfig();
   
-  // Get feature symbol image if available
+  /**
+   * Get feature symbol image for free spins mode
+   * Returns the image path for the expanding symbol during free spins
+   */
   const featureSymbolImage = useMemo(() => {
     if (!featureSymbol || !config?.symbols) return null;
     const symbol = config.symbols[featureSymbol as keyof typeof config.symbols];
     return symbol?.image || null;
   }, [featureSymbol, config]);
 
+  /**
+   * Determine spin button text based on current game state
+   * - "SPINNING": Reels are currently spinning
+   * - "FREE SPIN": In free spins mode
+   * - "ACTION SPIN": In action game mode
+   * - "SPIN": Normal base game
+   */
     const spinButtonText = useMemo(() => {
         if (isSpinning) return 'SPINNING';
         if (isFreeSpinsMode) return 'FREE SPIN';
@@ -111,6 +192,11 @@ export function ControlPanel({
         return 'SPIN';
     }, [isSpinning, isFreeSpinsMode, actionGameSpins]);
     
+    /**
+     * Adjust text size based on button text length
+     * Longer text ("FREE SPIN", "ACTION SPIN") uses smaller font
+     * Shorter text ("SPIN") uses larger font
+     */
     const spinButtonTextStyle = useMemo(() => {
         if (spinButtonText === 'FREE SPIN' || spinButtonText === 'ACTION SPIN') {
             return 'text-sm sm:text-base md:text-lg';
@@ -118,6 +204,12 @@ export function ControlPanel({
         return 'text-lg sm:text-xl md:text-2xl';
     }, [spinButtonText]);
 
+  /**
+   * Determine if spin button should be disabled
+   * Disabled when:
+   * - Reels are spinning, OR
+   * - Balance is insufficient (unless in free spins or action game mode)
+   */
   const isButtonDisabled = isSpinning || (balance < totalBet && !isFreeSpinsMode && actionGameSpins === 0);
 
   return (

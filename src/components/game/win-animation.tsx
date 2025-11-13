@@ -1,8 +1,42 @@
+/**
+ * WinAnimation Component
+ * 
+ * This component displays win celebration animations when a player wins.
+ * It shows confetti-like coin animations and a count-up display of the win amount.
+ * 
+ * Features:
+ * - Coin confetti animation (50 coins falling from top)
+ * - Count-up animation for win amount (4 second duration)
+ * - Dynamic win messages based on win amount
+ * - Fade-in and scale animations
+ * - Fixed overlay covering entire screen
+ * 
+ * Animation Flow:
+ * 1. Component mounts → coins start falling
+ * 2. Win amount counts up from 0 to target (4 seconds)
+ * 3. Display shown for 5 seconds total
+ * 4. Fade out → onAnimationComplete callback
+ * 
+ * Win Messages:
+ * - Based on win amount thresholds
+ * - Ranges from "Congratulations!" to "MEGA WIN!"
+ */
+
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
 import { Coins } from 'lucide-react';
 
+/**
+ * Props interface for WinAnimation component
+ * 
+ * @param feedback - Object containing win feedback information
+ *   - feedbackText: Message to display (e.g., "Congratulations!", "MEGA WIN!")
+ *   - winAmount: Total win amount to count up to
+ *   - animationType: Type of animation (e.g., "coins")
+ * @param onAnimationComplete - Callback when animation finishes
+ * @param onCountComplete - Optional callback when count-up completes
+ */
 interface WinAnimationProps {
   feedback: {
     feedbackText: string;
@@ -13,6 +47,21 @@ interface WinAnimationProps {
   onCountComplete?: (amount: number) => void;
 }
 
+/**
+ * Coin Component
+ * 
+ * Individual coin in the confetti animation
+ * 
+ * @param id - Unique identifier for this coin
+ * @param onEnded - Callback when coin animation completes
+ * 
+ * Behavior:
+ * - Random horizontal position (0-100%)
+ * - Random animation duration (3-5 seconds)
+ * - Random delay (0-2 seconds)
+ * - Rotates 720 degrees while falling
+ * - Fades out as it falls
+ */
 const Coin = ({ id, onEnded }: { id: number; onEnded: (id: number) => void }) => {
   const [style, setStyle] = useState<React.CSSProperties>({});
 
@@ -38,7 +87,23 @@ const Coin = ({ id, onEnded }: { id: number; onEnded: (id: number) => void }) =>
   );
 };
 
-// Generate win message based on amount
+/**
+ * Generate win message based on win amount
+ * 
+ * @param winAmount - The total win amount
+ * @returns Appropriate celebration message
+ * 
+ * Message thresholds:
+ * - ≤ R5: "Congratulations!"
+ * - ≤ R10: "Well done!"
+ * - ≤ R15: "Nice win!"
+ * - ≤ R25: "Great job!"
+ * - ≤ R50: "Excellent!"
+ * - ≤ R100: "Outstanding!"
+ * - ≤ R200: "Incredible!"
+ * - ≤ R300: "Amazing!"
+ * - > R300: "MEGA WIN!"
+ */
 const getWinMessage = (winAmount: number): string => {
   if (winAmount <= 5) {
     return 'Congratulations!';
@@ -62,26 +127,43 @@ const getWinMessage = (winAmount: number): string => {
 };
 
 export function WinAnimation({ feedback, onAnimationComplete, onCountComplete }: WinAnimationProps) {
+  // State for coin confetti animation
   const [coins, setCoins] = useState<number[]>([]);
+  
+  // State for fade in/out animation
   const [show, setShow] = useState(false);
+  
+  // State for count-up animation (displays current amount being counted)
   const [displayAmount, setDisplayAmount] = useState(0);
 
   useEffect(() => {
-    // Reset state when feedback changes
+    // Reset all state when feedback changes (new win)
     setShow(false);
     setDisplayAmount(0);
     setCoins([]);
     
+    // Delay showing animation by 500ms for smoother transition
     const showTimer = setTimeout(() => setShow(true), 500);
 
+    /**
+     * Initialize coin confetti animation
+     * Creates 50 coin elements that will fall from the top
+     */
     if (feedback.animationType?.includes('coin') || !feedback.animationType) {
       const newCoins = Array.from({ length: 50 }, (_, i) => i);
       setCoins(newCoins);
     }
 
-    // Counter animation for win amount using requestAnimationFrame for smoothness
+    /**
+     * Count-up animation for win amount
+     * Uses requestAnimationFrame for smooth 60fps counting
+     * 
+     * Animation details:
+     * - Duration: 4 seconds (fixed for all wins)
+     * - Easing: Ease-out cubic (starts fast, slows at end)
+     * - Updates displayAmount continuously from 0 to targetAmount
+     */
     const targetAmount = feedback.winAmount;
-    // Fixed slower duration for all wins to build anticipation
     const duration = 4000; // 4 seconds for all wins - slow and satisfying
     const startTime = performance.now();
     let animationFrameId: number | undefined;
@@ -90,15 +172,17 @@ export function WinAnimation({ feedback, onAnimationComplete, onCountComplete }:
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Ease-out cubic for more natural counting
+      // Ease-out cubic for more natural counting (starts fast, slows at end)
       const easeProgress = 1 - Math.pow(1 - progress, 3);
       const currentAmount = targetAmount * easeProgress;
       
       setDisplayAmount(currentAmount);
 
       if (progress < 1) {
+        // Continue animation until complete
         animationFrameId = requestAnimationFrame(animate);
       } else {
+        // Animation complete - set final amount
         setDisplayAmount(targetAmount);
         // Notify when counting is complete
         if (onCountComplete) {
@@ -109,7 +193,13 @@ export function WinAnimation({ feedback, onAnimationComplete, onCountComplete }:
 
     animationFrameId = requestAnimationFrame(animate);
 
-    // Fixed timer based on counting duration + fade time
+    /**
+     * Total animation duration: 5 seconds
+     * - 4 seconds: Count-up animation
+     * - 1 second: Display at final amount
+     * - 500ms: Fade out
+     * Then calls onAnimationComplete callback
+     */
     const totalDuration = duration + 1000; // Add 1 second for fade out (5 seconds total)
     const animationTimer = setTimeout(() => {
         setShow(false);
@@ -181,14 +271,24 @@ export function WinAnimation({ feedback, onAnimationComplete, onCountComplete }:
   );
 }
 
-// Helper function to generate win feedback
+/**
+ * Helper function to generate win feedback object
+ * 
+ * @param winAmount - Total win amount
+ * @param winningSymbols - Array of winning symbol IDs (currently unused)
+ * @param betAmount - Bet amount (currently unused)
+ * @returns Object with feedback text, win amount, and animation type
+ * 
+ * This function creates the feedback object used by WinAnimation component.
+ * Can be extended to customize feedback based on winning symbols or bet amount.
+ */
 export function getWinningFeedback(winAmount: number, winningSymbols: string[] = [], betAmount: number = 0): {
   feedbackText: string;
   winAmount: number;
   animationType: string;
 } {
   const feedbackText = getWinMessage(winAmount);
-  const animationType = 'coins'; // Can be extended to support other types
+  const animationType = 'coins'; // Can be extended to support other types (e.g., 'sparks', 'fireworks')
   
   return {
     feedbackText,

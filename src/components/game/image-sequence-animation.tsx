@@ -1,8 +1,43 @@
+/**
+ * ImageSequenceAnimation Component
+ * 
+ * This component plays frame-by-frame animations for winning symbols.
+ * It loads and displays a sequence of images from the /animations/{symbol}/ folder.
+ * 
+ * Features:
+ * - Frame-by-frame animation (72 frames per symbol)
+ * - Smooth 60fps playback using requestAnimationFrame
+ * - Looping animation while isPlaying is true
+ * - Configurable duration (default: 3 seconds per loop)
+ * - Symbol ID to folder name mapping
+ * - Optimized frame updates (only updates when frame changes)
+ * 
+ * Animation Details:
+ * - Total frames: 72 per symbol
+ * - Frame format: {symbol}_{frameNumber}.webp (e.g., "Queen_1.webp")
+ * - Path: /animations/{folderName}/{symbol}_{frame}.webp
+ * - Loops continuously while isPlaying is true
+ * 
+ * Performance:
+ * - Uses requestAnimationFrame for smooth 60fps playback
+ * - Only updates state when frame number changes
+ * - Prevents unnecessary re-renders
+ * - Returns null when not playing to save resources
+ */
+
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 
+/**
+ * Props interface for ImageSequenceAnimation component
+ * 
+ * @param symbolId - The ID of the symbol to animate (e.g., "Queen", "Scatter")
+ * @param isPlaying - Whether the animation should play (loops while true)
+ * @param duration - Duration in seconds for one complete cycle (default: 3)
+ * @param className - Additional CSS classes to apply
+ */
 interface ImageSequenceAnimationProps {
   symbolId: string;
   isPlaying: boolean;
@@ -16,15 +51,35 @@ export function ImageSequenceAnimation({
   duration = 3, 
   className 
 }: ImageSequenceAnimationProps) {
+  // State for current frame being displayed (1-72)
   const [currentFrame, setCurrentFrame] = useState(1);
+  
+  // State for animation lifecycle
   const [isAnimating, setIsAnimating] = useState(false);
   const [isReady, setIsReady] = useState(false);
-  const animationRef = useRef<number>();
-  const startTimeRef = useRef<number>();
-  const lastFrameRef = useRef<number>(0);
   
+  // Refs for animation control
+  const animationRef = useRef<number>(); // requestAnimationFrame ID
+  const startTimeRef = useRef<number>(); // Animation start timestamp
+  const lastFrameRef = useRef<number>(0); // Last displayed frame (for optimization)
+  
+  // Total number of frames in the animation sequence
   const totalFrames = 72;
   
+  /**
+   * Animation loop function
+   * 
+   * Calculates which frame to display based on elapsed time and duration.
+   * Uses modulo to loop the animation continuously.
+   * 
+   * @param currentTime - Current timestamp from requestAnimationFrame
+   * 
+   * Frame calculation:
+   * - elapsed = time since animation started (in seconds)
+   * - progress = (elapsed / duration) % 1 (loops 0-1)
+   * - frame = progress × totalFrames (0-71)
+   * - adjustedFrame = frame + 1 (1-72, clamped)
+   */
   const animate = useCallback((currentTime: number) => {
     if (!startTimeRef.current || !isPlaying) return;
     
@@ -82,12 +137,27 @@ export function ImageSequenceAnimation({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying]); // Only depend on isPlaying to prevent infinite loops
   
-  // Generate the image path for the current frame
+  /**
+   * Generate the image path for a specific frame
+   * 
+   * @param frame - Frame number (1-72)
+   * @returns Path to the frame image (e.g., "/animations/Queen/Queen_1.webp")
+   * 
+   * Path format: /animations/{folderName}/{symbol}_{frameNumber}.webp
+   */
   const getImagePath = (frame: number) => {
+    // Clamp frame number to valid range (1-72)
     const frameNumber = Math.max(1, Math.min(frame, totalFrames));
     
-    // Map symbol IDs to their correct folder names
-    // Symbol IDs now match image file names, so we can use them directly
+    /**
+     * Map symbol IDs to their correct folder names
+     * 
+     * Some symbols have different IDs in code vs folder names.
+     * This function ensures we load from the correct folder.
+     * 
+     * @param id - Symbol ID from config
+     * @returns Folder name for animation images
+     */
     const getFolderName = (id: string) => {
       const folderMap: Record<string, string> = {
         // Card symbols

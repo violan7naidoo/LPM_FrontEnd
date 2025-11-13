@@ -1,3 +1,28 @@
+/**
+ * PaylineNumbers Component
+ * 
+ * This component displays payline number indicators on the left and right sides
+ * of the reel grid. It shows which paylines are active and highlights winning paylines.
+ * 
+ * Features:
+ * - Displays numbers 1-5 for all paylines
+ * - Highlights active/winning paylines with colored backgrounds
+ * - Positions numbers based on payline paths (start/end positions)
+ * - Handles overlapping paylines with offset positioning
+ * - Responsive sizing for different screen sizes
+ * 
+ * Layout:
+ * - Left side: Numbers positioned based on first reel of each payline
+ * - Right side: Numbers positioned based on last reel of each payline
+ * - Numbers are absolutely positioned to align with payline paths
+ * 
+ * Positioning Logic:
+ * - Uses payline definition (array of row indices) to determine position
+ * - Blends start position (70%) with average position (30%) for better alignment
+ * - Adds edge padding (12%) to keep numbers within bounds
+ * - Offsets overlapping paylines to prevent visual collision
+ */
+
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -5,6 +30,14 @@ import { ReactNode } from "react";
 import { PAYLINE_COLORS } from "./winning-lines-display";
 import { usePaylines, useNumRows } from "@/lib/slot-config";
 
+/**
+ * Props interface for PaylineNumbers component
+ * 
+ * @param winningLines - Array of winning line objects with payline indices
+ * @param isSpinning - Whether reels are currently spinning
+ * @param numPaylines - Number of active paylines (default: 5)
+ * @param children - The reel grid content to wrap
+ */
 interface PaylineNumbersProps {
   winningLines: Array<{
     paylineIndex: number;
@@ -19,19 +52,39 @@ interface PaylineNumbersProps {
 }
 
 export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, children }: PaylineNumbersProps) {
+  // Load configuration values from hooks
   const paylines = usePaylines();
   const numRows = useNumRows();
   
-  // Get unique payline indices from winning lines (only active paylines)
+  /**
+   * Extract active payline indices from winning lines
+   * - Filters out invalid indices (-1 or >= numPaylines)
+   * - Gets unique payline indices that have wins
+   * - Used to highlight which paylines are currently winning
+   */
   const activePaylines = [...new Set(winningLines.map(line => line.paylineIndex).filter(index => index !== -1 && index < numPaylines))];
   
-  // Create array of all 5 paylines (1-5) - show all but highlight only active ones
+  /**
+   * Create array of all payline numbers (1-5)
+   * - Always shows all 5 paylines
+   * - Active paylines are highlighted with colored backgrounds
+   * - Inactive paylines are shown with muted styling
+   */
   const paylineNumbers = Array.from({ length: 5 }, (_, i) => i + 1);
   
-  // Helper function to convert row index to percentage position
-  // Row 0 = top, Row 1 = middle, Row 2 = bottom
-  // Can handle decimal values for blended positions
-  // Adds padding to keep numbers within bounds (number is 24px tall, so need ~12px padding from edges)
+  /**
+   * Convert row index to percentage position for vertical positioning
+   * 
+   * @param rowIndex - Row index (0 = top, 1 = middle, 2 = bottom)
+   * @param edgePadding - Percentage of space to reserve at top/bottom (default: 12%)
+   * 
+   * Logic:
+   * - Row 0 → ~12% from top
+   * - Row 1 → ~50% (middle)
+   * - Row 2 → ~88% from top
+   * 
+   * Edge padding prevents numbers from being cut off at screen edges
+   */
   const getRowPosition = (rowIndex: number, edgePadding: number = 0.12): string => {
     if (numRows === 1) return '50%';
     // Clamp to valid range [0, numRows - 1]
@@ -45,17 +98,31 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
     return `${paddedPosition * 100}%`;
   };
   
-  // Calculate the average row position for a payline (to position numbers closer to the actual line path)
+  /**
+   * Calculate the average row position for a payline
+   * Used to position numbers closer to the actual payline path
+   * 
+   * @param payline - Array of row indices for each reel
+   * @returns Average row index (can be decimal for blended positioning)
+   * 
+   * Example: Payline [0, 1, 2, 1, 0] → average = 0.8
+   */
   const getAverageRowPosition = (payline: number[]): number => {
     if (payline.length === 0) return 0;
     const sum = payline.reduce((acc, row) => acc + row, 0);
     return sum / payline.length;
   };
   
-  // Group paylines by their start/end positions to handle overlaps
-  // Left side: group by first reel position, but also consider the path
+  /**
+   * Group paylines by their start/end positions to handle overlaps
+   * 
+   * When multiple paylines start/end at the same row, they need offset positioning
+   * to prevent visual collision. This grouping identifies which paylines share positions.
+   * 
+   * - leftGroups: Groups paylines by their starting row (first reel)
+   * - rightGroups: Groups paylines by their ending row (last reel)
+   */
   const leftGroups = new Map<number, number[]>();
-  // Right side: group by last reel position, but also consider the path
   const rightGroups = new Map<number, number[]>();
   
   paylineNumbers.forEach((number) => {
@@ -91,8 +158,24 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
     });
   };
   
-  // Helper to get offset for paylines sharing the same position
-  // Increased spacing significantly - each number is 24px, need at least 30px spacing to prevent overlap
+  /**
+   * Calculate offset for paylines that share the same position
+   * 
+   * When multiple paylines start/end at the same row, they need to be offset
+   * vertically to prevent overlapping. This function calculates the offset
+   * for each payline in a group.
+   * 
+   * @param paylineIndex - Index of the payline to calculate offset for
+   * @param group - Array of payline indices that share the same position
+   * @param isLeft - Whether calculating for left side (true) or right side (false)
+   * @param maxOffset - Maximum offset in pixels (default: 40px)
+   * @returns Vertical offset in pixels (can be negative or positive)
+   * 
+   * Spacing:
+   * - Each number is 40-56px tall (responsive)
+   * - Minimum 30px spacing between numbers
+   * - Numbers are centered around the base position
+   */
   const getOffset = (paylineIndex: number, group: number[], isLeft: boolean, maxOffset: number = 40): number => {
     const sortedGroup = sortGroupByPosition(group, isLeft);
     const indexInGroup = sortedGroup.indexOf(paylineIndex);
@@ -115,7 +198,7 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
   return (
     <div className="flex items-center justify-center w-full h-full relative">
       {/* Left side payline numbers */}
-      <div className="absolute -left-2 sm:-left-3 md:-left-4 top-0 bottom-0 w-10 sm:w-12 md:w-14 flex flex-col justify-between items-center z-10">
+      <div className="absolute -left-2 sm:-left-3 md:-left-4 top-0 bottom-0 w-8 sm:w-9 md:w-10 flex flex-col justify-between items-center z-10">
         {paylineNumbers.map((number) => {
           const paylineIndex = number - 1;
           const isActive = activePaylines.includes(paylineIndex);
@@ -151,7 +234,7 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
             <div
               key={`left-${number}`}
               className={cn(
-                "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-base sm:text-lg md:text-xl font-bold transition-all duration-300 absolute",
+                "w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-base sm:text-lg md:text-xl font-bold transition-all duration-300 absolute",
                 isActive ? "text-white shadow-lg animate-pulse" : paylineIndex < numPaylines ? "bg-black/50 text-muted-foreground border-2 border-primary/30" : "bg-black/20 text-muted-foreground/50 border-2 border-primary/10 opacity-50"
               )}
               style={{
@@ -175,7 +258,7 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
       </div>
 
       {/* Right side payline numbers */}
-      <div className="absolute -right-2 sm:-right-3 md:-right-4 top-0 bottom-0 w-10 sm:w-12 md:w-14 flex flex-col justify-between items-center z-10">
+      <div className="absolute -right-2 sm:-right-3 md:-right-4 top-0 bottom-0 w-8 sm:w-9 md:w-10 flex flex-col justify-between items-center z-10">
         {paylineNumbers.map((number) => {
           const paylineIndex = number - 1;
           const isActive = activePaylines.includes(paylineIndex);
@@ -210,7 +293,7 @@ export function PaylineNumbers({ winningLines, isSpinning, numPaylines = 5, chil
             <div
               key={`right-${number}`}
               className={cn(
-                "w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-base sm:text-lg md:text-xl font-bold transition-all duration-300 absolute",
+                "w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center text-base sm:text-lg md:text-xl font-bold transition-all duration-300 absolute",
                 isActive ? "text-white shadow-lg animate-pulse" : paylineIndex < numPaylines ? "bg-black/50 text-muted-foreground border-2 border-primary/30" : "bg-black/20 text-muted-foreground/50 border-2 border-primary/10 opacity-50"
               )}
               style={{

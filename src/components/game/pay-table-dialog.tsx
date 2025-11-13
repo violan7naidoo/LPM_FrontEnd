@@ -1,3 +1,27 @@
+/**
+ * PayTableDialog Component
+ * 
+ * This component displays a detailed paytable showing all symbol payouts
+ * for different bet amounts. It's accessible from the control panel.
+ * 
+ * Features:
+ * - Shows all symbols with their images
+ * - Displays payouts for current bet amount (if totalBet provided)
+ * - Shows payouts for all bet amounts (if totalBet not provided)
+ * - Displays action games (AG) when available
+ * - Responsive grid layout (2-5 columns based on screen size)
+ * 
+ * Layout:
+ * - Modal dialog with scrollable content
+ * - Grid of symbol cards (2 cols mobile, 3 cols tablet, 5 cols desktop)
+ * - Each card shows symbol image, name, and payouts
+ * 
+ * Data:
+ * - Reads from game config (symbol.payout and symbol.actionGames)
+ * - Formats bet keys as "1.00", "2.00", etc.
+ * - Shows payout counts (2x, 3x, 4x, 5x) based on config
+ */
+
 import {
   Dialog,
   DialogContent,
@@ -13,6 +37,14 @@ import { SymbolDisplay } from './symbol-display';
 import { Menu } from 'lucide-react';
 import { useGameConfig } from '@/hooks/use-game-config';
 
+/**
+ * Props interface for PayTableDialog component
+ * 
+ * @param betPerPayline - Bet amount per payline (currently unused, kept for compatibility)
+ * @param totalBet - Total bet amount (R1, R2, R3, or R5)
+ *                   If provided, shows payouts for this bet only
+ *                   If not provided, shows payouts for all bet amounts
+ */
 interface PayTableDialogProps {
   betPerPayline?: number;
   totalBet?: number; // Total bet amount (R1, R2, R3, or R5)

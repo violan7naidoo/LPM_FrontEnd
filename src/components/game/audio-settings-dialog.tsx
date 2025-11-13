@@ -1,3 +1,23 @@
+/**
+ * AudioSettingsDialog Component
+ * 
+ * This component provides audio settings controls in a modal dialog.
+ * Players can adjust volume and toggle music/sound effects.
+ * 
+ * Features:
+ * - Volume slider (0-100)
+ * - Music toggle checkbox
+ * - Sound effects (SFX) toggle checkbox
+ * - SFX explanation text
+ * - Responsive layout
+ * 
+ * Layout:
+ * - Modal dialog with form controls
+ * - Volume slider with min/max labels
+ * - Toggle checkboxes in styled cards
+ * - Information text explaining SFX
+ */
+
 import {
   Dialog,
   DialogContent,
@@ -10,6 +30,16 @@ import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Volume2 } from 'lucide-react';
 
+/**
+ * Props interface for AudioSettingsDialog component
+ * 
+ * @param isMusicEnabled - Whether background music is enabled
+ * @param onToggleMusic - Callback to toggle music on/off
+ * @param isSfxEnabled - Whether sound effects are enabled
+ * @param onToggleSfx - Callback to toggle sound effects on/off
+ * @param volume - Current volume level (0-100)
+ * @param onVolumeChange - Callback to change volume level
+ */
 interface AudioSettingsDialogProps {
   isMusicEnabled: boolean;
   onToggleMusic: () => void;

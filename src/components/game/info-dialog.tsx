@@ -1,3 +1,23 @@
+/**
+ * InfoDialog Component
+ * 
+ * This component displays game rules and information in a modal dialog.
+ * It provides players with instructions on how to play the game.
+ * 
+ * Features:
+ * - Game information (name, RTP, bet limits)
+ * - How to Play section
+ * - Special Features explanation
+ * - Paylines information
+ * - Turbo Mode explanation
+ * - Responsible Gaming guidelines
+ * 
+ * Layout:
+ * - Modal dialog with scrollable content
+ * - Responsive sizing (95vw width, 90vh height)
+ * - Sections organized in cards with borders
+ */
+
 import {
   Dialog,
   DialogContent,
