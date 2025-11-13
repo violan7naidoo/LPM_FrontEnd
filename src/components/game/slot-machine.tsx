@@ -768,13 +768,29 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
           stopAutoplay();
         }
       }
+
+      // Arrow Up key - Increase Bet
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        if (!isSpinning && !isFreeSpinsMode) {
+          handleIncreaseBet();
+        }
+      }
+
+      // Arrow Down key - Decrease Bet
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        if (!isSpinning && !isFreeSpinsMode) {
+          handleDecreaseBet();
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isSpinning, sessionId, balance, totalBet, freeSpinsRemaining, actionGameSpins, spin, playClickSound, autoplayState.isActive, stopAutoplay]);
+  }, [isSpinning, sessionId, balance, totalBet, freeSpinsRemaining, actionGameSpins, spin, playClickSound, autoplayState.isActive, stopAutoplay, isFreeSpinsMode, handleIncreaseBet, handleDecreaseBet]);
 
   // Autoplay effect - handles automatic spinning with stop conditions
   useEffect(() => {

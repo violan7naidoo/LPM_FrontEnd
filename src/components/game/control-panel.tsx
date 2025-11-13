@@ -24,10 +24,7 @@ import { Card } from "@/components/ui/card";
 import { PayTableDialog } from "./pay-table-dialog";
 import { InfoDialog } from "./info-dialog";
 import { AudioSettingsDialog } from "./audio-settings-dialog";
-import { Plus, Minus, RotateCw } from "lucide-react";
-import { useMemo } from 'react';
-import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import { Plus, Minus } from "lucide-react";
 import { useGameConfig } from '@/hooks/use-game-config';
 
 /**
@@ -168,40 +165,6 @@ export function ControlPanel({
   // Load game configuration (kept for potential future use)
   const { config } = useGameConfig();
 
-  /**
-   * Determine spin button text based on current game state
-   * - "SPINNING": Reels are currently spinning
-   * - "FREE SPIN": In free spins mode
-   * - "ACTION SPIN": In action game mode
-   * - "SPIN": Normal base game
-   */
-    const spinButtonText = useMemo(() => {
-        if (isSpinning) return 'SPINNING';
-        if (isFreeSpinsMode) return 'FREE SPIN';
-        if (actionGameSpins > 0) return 'ACTION SPIN';
-        return 'SPIN';
-    }, [isSpinning, isFreeSpinsMode, actionGameSpins]);
-    
-    /**
-     * Adjust text size based on button text length
-     * Longer text ("FREE SPIN", "ACTION SPIN") uses smaller font
-     * Shorter text ("SPIN") uses larger font
-     */
-    const spinButtonTextStyle = useMemo(() => {
-        if (spinButtonText === 'FREE SPIN' || spinButtonText === 'ACTION SPIN') {
-            return 'text-sm sm:text-base md:text-lg';
-        }
-        return 'text-lg sm:text-xl md:text-2xl';
-    }, [spinButtonText]);
-
-  /**
-   * Determine if spin button should be disabled
-   * Disabled when:
-   * - Reels are spinning, OR
-   * - Balance is insufficient (unless in free spins or action game mode)
-   */
-  const isButtonDisabled = isSpinning || (balance < totalBet && !isFreeSpinsMode && actionGameSpins === 0);
-
   return (
     <Card className="w-full p-4 md:p-6 lg:p-8 shadow-2xl control-panel-card backdrop-blur">
         {/* Desktop layout - single horizontal line */}
@@ -233,82 +196,6 @@ export function ControlPanel({
                 <InfoDisplay label="Action Spins" value={actionGameSpins} isCurrency={false} />
             )}
 
-            {/* TURBO Button */}
-            <Button
-                onClick={onToggleTurbo}
-                className={`
-                    relative w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full
-                    flex items-center justify-center p-0
-                    text-white transition-all duration-300 ease-in-out
-                    shadow-xl transform active:scale-95
-                    ${isTurboMode 
-                        ? 'opacity-80' 
-                        : 'hover:scale-105'
-                    }
-                `}
-            >
-                <Image
-                    src="/Control_Panel/turbo.png"
-                    alt="Turbo Button"
-                    fill
-                    className="object-cover rounded-full"
-                    unoptimized
-                />
-            </Button>
-            
-            {/* SPIN Button */}
-            <Button
-                onClick={onSpin}
-                disabled={isButtonDisabled}
-                className={`
-                    relative w-24 h-24 md:w-32 md:h-32 lg:w-36 lg:h-36 rounded-full
-                    flex items-center justify-center p-0
-                    transition-all duration-300 ease-in-out
-                    shadow-xl transform active:scale-95
-                    ${isButtonDisabled 
-                        ? 'opacity-50 cursor-not-allowed' 
-                        : 'hover:scale-105'
-                    }
-                `}
-            >
-                {isSpinning ? (
-                    <RotateCw className="w-14 h-14 md:w-18 md:h-18 lg:w-20 lg:h-20 animate-spin-slow text-white absolute z-10" />
-                ) : (
-                    <Image
-                        src="/Control_Panel/spin_btn.png"
-                        alt="Spin Button"
-                        fill
-                        className="object-cover rounded-full"
-                        unoptimized
-                    />
-                )}
-            </Button>
-
-            {/* AUTO SPIN Button */}
-            {autoplayState && (
-                <Button
-                    onClick={autoplayState.isActive ? onStopAutoplay : onShowAutoplayDialog}
-                    className={`
-                        relative w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full
-                        flex items-center justify-center p-0
-                        text-white transition-all duration-300 ease-in-out
-                        shadow-xl transform active:scale-95
-                        ${autoplayState.isActive 
-                            ? 'opacity-80' 
-                            : 'hover:scale-105'
-                        }
-                    `}
-                >
-                    <Image
-                        src="/Control_Panel/auto_spin.png"
-                        alt="Auto Spin Button"
-                        fill
-                        className="object-cover rounded-full"
-                        unoptimized
-                    />
-                </Button>
-            )}
-
             {/* Win */}
             <InfoDisplay label="Win" value={lastWin.toFixed(2)} />
         
@@ -329,86 +216,7 @@ export function ControlPanel({
 
         {/* Mobile layout */}
         <div className="sm:hidden space-y-2 mt-2">
-            {/* Top row: Action buttons */}
-            <div className="flex items-center justify-center gap-3">
-                {/* TURBO Button */}
-                <Button
-                    onClick={onToggleTurbo}
-                    className={`
-                        relative w-12 h-12 rounded-full
-                        flex items-center justify-center p-0
-                        text-white transition-all duration-300 ease-in-out
-                        shadow-xl transform active:scale-95
-                        ${isTurboMode 
-                            ? 'opacity-80' 
-                            : 'hover:scale-105'
-                        }
-                    `}
-                >
-                    <Image
-                        src="/Control_Panel/turbo.png"
-                        alt="Turbo Button"
-                        fill
-                        className="object-cover rounded-full"
-                        unoptimized
-                    />
-                </Button>
-                
-                {/* SPIN Button */}
-                <Button
-                    onClick={onSpin}
-                    disabled={isButtonDisabled}
-                    className={`
-                        relative w-16 h-16 rounded-full
-                        flex items-center justify-center p-0
-                        transition-all duration-300 ease-in-out
-                        shadow-xl transform active:scale-95
-                        ${isButtonDisabled 
-                            ? 'opacity-50 cursor-not-allowed' 
-                            : 'hover:scale-105'
-                        }
-                    `}
-                >
-                    {isSpinning ? (
-                        <RotateCw className="w-8 h-8 animate-spin-slow text-white absolute z-10" />
-                    ) : (
-                        <Image
-                            src="/Control_Panel/spin_btn.png"
-                            alt="Spin Button"
-                            fill
-                            className="object-cover rounded-full"
-                            unoptimized
-                        />
-                    )}
-                </Button>
-                
-                {/* AUTO SPIN Button */}
-                {autoplayState && (
-                    <Button
-                        onClick={autoplayState.isActive ? onStopAutoplay : onShowAutoplayDialog}
-                        className={`
-                            relative w-12 h-12 rounded-full
-                            flex items-center justify-center p-0
-                            text-white transition-all duration-300 ease-in-out
-                            shadow-xl transform active:scale-95
-                            ${autoplayState.isActive 
-                                ? 'opacity-80' 
-                                : 'hover:scale-105'
-                            }
-                        `}
-                    >
-                        <Image
-                            src="/Control_Panel/auto_spin.png"
-                            alt="Auto Spin Button"
-                            fill
-                            className="object-cover rounded-full"
-                            unoptimized
-                        />
-                    </Button>
-                )}
-            </div>
-
-            {/* Middle row: Win, Bet */}
+            {/* Top row: Win, Bet */}
             <div className="flex gap-2">
                 <div className="flex-1">
                     <MobileInfoDisplay label="Win" value={lastWin.toFixed(2)} />

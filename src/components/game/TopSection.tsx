@@ -91,7 +91,7 @@ function PayCell({
     const pay = payouts[countKey] || 0;
     const ag = actionGames[countKey] || 0;
     return (
-      <p key={count} className="text-white text-xl leading-tight">
+      <p key={count} className="text-white text-2xl leading-tight">
         {count}x{' '}
         <span className="text-yellow-400 font-bold">
           {pay.toFixed(2)}
@@ -120,7 +120,7 @@ function PayCell({
           height={160}
           className="object-contain w-40 h-40 flex-shrink-0"
         />
-        <div className="text-xl font-bold leading-tight text-white w-[240px] flex-shrink-0">
+        <div className="text-2xl font-bold leading-tight text-white w-[240px] flex-shrink-0">
           {formatPayout(5)}
           {formatPayout(4)}
           {formatPayout(3)}
@@ -174,7 +174,7 @@ function LowPayCell({
     const pay = payouts[countKey] || 0;
     const ag = actionGames[countKey] || 0;
     return (
-      <p key={count} className="text-white text-xl leading-tight">
+      <p key={count} className="text-white text-2xl leading-tight">
         {count}x{' '}
         <span className="text-yellow-400 font-bold">
           {pay.toFixed(2)}
@@ -204,7 +204,7 @@ function LowPayCell({
             />
           ))}
         </div>
-        <div className="text-xl font-bold leading-tight text-white w-[240px] flex-shrink-0">
+        <div className="text-2xl font-bold leading-tight text-white w-[240px] flex-shrink-0">
           {formatPayout(5)}
           {formatPayout(4)}
           {formatPayout(3)}
@@ -339,7 +339,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
                   const pay = payouts[countKey] || 0;
                   const ag = actionGames[countKey] || 0;
                   return (
-                    <p key={count} className="text-white text-xl leading-tight">
+                    <p key={count} className="text-white text-2xl leading-tight">
                       {count}x{' '}
                       <span className="text-yellow-400 font-bold">
                         {pay.toFixed(2)}
@@ -361,7 +361,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
                       height={160}
                       className="object-contain w-40 h-40"
                     />
-                    <div className="text-2xl font-bold leading-tight text-white">
+                    <div className="text-3xl font-bold leading-tight text-white">
                       {formatPayout(5)}
                       {formatPayout(4)}
                       {formatPayout(3)}
@@ -489,9 +489,9 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
           </div>
         ) : (
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[350px]">
-            <p className="text-yellow-400 font-bold text-2xl">10 PENNY GAMES</p>
-            <p className="text-yellow-400 font-bold text-2xl">+</p>
-            <p className="text-yellow-400 font-bold text-xl">SPECIAL EXPANDING SYMBOL</p>
+            <p className="text-yellow-400 font-bold text-3xl">10 PENNY GAMES</p>
+            <p className="text-yellow-400 font-bold text-3xl">+</p>
+            <p className="text-yellow-400 font-bold text-2xl">SPECIAL EXPANDING SYMBOL</p>
           </div>
         )}
       </div>
