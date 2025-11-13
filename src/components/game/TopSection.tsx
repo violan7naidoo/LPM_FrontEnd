@@ -109,7 +109,7 @@ function PayCell({
   return (
     // Background block: semi-transparent black with yellow border
     // p-6 = 24px padding, border-4 = 4px border, rounded-lg = 8px border radius
-    // w-[420px]: Reduced width to allow center block to fit better
+    // w-[420px]: Fixed width to allow blocks to meet in the middle with proper spacing
     <div className="bg-black/40 rounded-lg p-6 border-4 border-yellow-400/50 w-[420px]">
       {/* Flex container: symbol image on left, payouts on right */}
       <div className="flex items-center gap-8">
@@ -189,7 +189,7 @@ function LowPayCell({
   };
 
   return (
-    <div className="bg-black/40 rounded-lg p-6 border-4 border-yellow-400/50 w-[500px]">
+    <div className="bg-black/40 rounded-lg p-6 border-4 border-yellow-400/50 w-[600px]">
       <div className="flex items-center gap-4">
         <div className="flex flex-shrink-0">
           {symbols.map((symbol, index) => (
@@ -289,14 +289,16 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
   return (
     /**
      * Main Container
-     * - flex-[1.5]: Takes 1.5/6 of the vertical space in the game container
+     * - flex-[1.5]: Takes 1.5/6.5 of the vertical space in the game container (increased height)
      * - relative: Allows absolute positioning of the "10 PENNY GAMES" overlay
      * - Background: Dark blue radial gradient for visual depth
-     * - pt-16: Extra top padding to move paytable down
-     * - pb-0: No bottom padding to allow paytable to extend into middle section
+     * - pt-0: No top padding to fill space under title
+     * - pb-4: Bottom padding to keep content within section
+     * - No horizontal padding to stretch paytable edge-to-edge
+     * - overflow-hidden: Prevents content from overflowing into other sections
      */
     <div
-      className="flex-[1.5] flex items-start justify-center bg-black/20 border-b-2 border-primary/30 px-2 pt-16 pb-0 relative overflow-visible"
+     className="flex-[1.3] flex items-start justify-center bg-black/20 border-b-2 border-primary/30 pt-0 pb-4 relative overflow-hidden px-0"
       style={{
         background:
           'radial-gradient(circle, rgba(0,20,50,0.5) 0%, rgba(0,10,30,0.5) 100%)',
@@ -309,10 +311,11 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
         - gap-y-4: 16px vertical gap between rows (reduced from 24px)
         - w-full: Full width to extend closer to edges
         - relative: Allows absolute positioning of center overlay
-        - -mb-[200px]: Negative margin to extend into middle section
+        - scale-75: Scales down the entire paytable to 75% to fit within top section
+        - origin-top: Scales from top to position at the very top of the section
         - z-10: Ensure paytable appears above middle section content
       */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4 w-full relative -mb-[200px] z-10">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4 w-full relative scale-75 origin-top z-10">
         {/* 
           Row 1 (Top): Scatter and SUBSTITUTES FOR combined in one long block
           - col-span-2: Spans both columns of the grid
@@ -447,17 +450,21 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
           - Both blocks have same width (500px) and meet in the middle with spacing
           - LowPayCell handles multiple symbols with shared payouts
         */}
-        <LowPayCell
-          symbolIds={['A', 'K']}
-          betKey={betKey}
-          config={config}
-        />
-        <div className="flex justify-end">
+        <div className="w-fit">
           <LowPayCell
-            symbolIds={['Q', 'J', '10']}
+            symbolIds={['A', 'K']}
             betKey={betKey}
             config={config}
           />
+        </div>
+        <div className="flex justify-end">
+          <div className="w-fit">
+            <LowPayCell
+              symbolIds={['Q', 'J', '10']}
+              betKey={betKey}
+              config={config}
+            />
+          </div>
         </div>
 
         {/* 
