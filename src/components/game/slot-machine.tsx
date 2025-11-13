@@ -29,9 +29,10 @@ interface SlotMachineProps {
   betAmount: number;
   setBetAmount: (amount: number) => void;
   betPerPayline: number;
+  onFreeSpinsStateChange?: (isFreeSpinsMode: boolean, featureSymbol: string) => void;
 }
 
-export function SlotMachine({ betAmount, setBetAmount, betPerPayline }: SlotMachineProps) {
+export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange }: SlotMachineProps) {
   // Get config values from hooks
   const numReels = useNumReels();
   const numRows = useNumRows();
@@ -41,6 +42,9 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline }: SlotMach
   const paylines = usePaylines();
   const { config } = useGameConfig();
   const { toast } = useToast();
+  
+  // Get scatter symbol for preventing consecutive scatters
+  const scatterSymbol = config?.bookSymbol || config?.scatterSymbol || 'Scatter';
 
   // Generate initial grid (for visual purposes only)
   const generateInitialGrid = useCallback((): SymbolId[][] => {
@@ -53,21 +57,44 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline }: SlotMach
   useEffect(() => {
     if (!config || reelStrips.length === 0) return;
     // Randomize the grid on the client
+    // Prevent consecutive scatter symbols on the same reel
     setGrid(
       Array(numReels)
         .fill(null)
-        .map((_, reelIndex) =>
-          Array(numRows)
-            .fill(null)
-            .map(() => {
+        .map((_, reelIndex) => {
+          const reel: SymbolId[] = [];
               const reelStrip = reelStrips[reelIndex] || [];
-              return reelStrip.length > 0 
-                ? reelStrip[Math.floor(Math.random() * reelStrip.length)]
-                : (Object.keys(config.symbols)[0] as SymbolId);
-            })
-        )
+          
+          for (let rowIndex = 0; rowIndex < numRows; rowIndex++) {
+            let symbol: SymbolId;
+            
+            if (reelStrip.length > 0) {
+              // Get random symbol from strip
+              let symbolIndex = Math.floor(Math.random() * reelStrip.length);
+              symbol = reelStrip[symbolIndex];
+              
+              // Prevent consecutive scatter symbols on the same reel
+              if (rowIndex > 0 && reel[rowIndex - 1] === scatterSymbol && symbol === scatterSymbol) {
+                // Find next non-scatter symbol in the strip
+                let attempts = 0;
+                let nextIndex = (symbolIndex + 1) % reelStrip.length;
+                while (reelStrip[nextIndex] === scatterSymbol && attempts < reelStrip.length) {
+                  nextIndex = (nextIndex + 1) % reelStrip.length;
+                  attempts++;
+                }
+                symbol = reelStrip[nextIndex];
+              }
+            } else {
+              symbol = Object.keys(config.symbols)[0] as SymbolId;
+            }
+            
+            reel.push(symbol);
+          }
+          
+          return reel;
+        })
     );
-  }, [numReels, numRows, reelStrips, config]);
+  }, [numReels, numRows, reelStrips, config, scatterSymbol]);
   
   // Initialize spinning reels array based on config
   useEffect(() => {
@@ -127,6 +154,13 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline }: SlotMach
   
   // Background music management
   const isFreeSpinsMode = useMemo(() => freeSpinsRemaining > 0, [freeSpinsRemaining]);
+
+  // Notify parent component when free spins state changes
+  useEffect(() => {
+    if (onFreeSpinsStateChange) {
+      onFreeSpinsStateChange(isFreeSpinsMode, featureSymbol);
+    }
+  }, [isFreeSpinsMode, featureSymbol, onFreeSpinsStateChange]);
   
   useEffect(() => {
     // If music is disabled, stop all music
@@ -626,9 +660,10 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline }: SlotMach
       
       // Update state from response (values are already in Rands)
       setBalance(response.player.balance);
-      setFreeSpinsRemaining(response.freeSpins);
-      setActionGameSpins(response.actionGameSpins);
-      setFeatureSymbol(response.featureSymbol);
+      // Use player.freeSpinsRemaining which is the decremented value from backend
+      setFreeSpinsRemaining(response.player.freeSpinsRemaining);
+      setActionGameSpins(response.player.actionGameSpins);
+      setFeatureSymbol(response.player.featureSymbol);
       setLastWin(response.player.lastWin);
 
       // Show feature symbol selection animation if free spins were triggered (only if NOT already in free spins)
@@ -689,6 +724,57 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline }: SlotMach
       return null;
     }
   }, [isSpinning, balance, totalBet, numPaylines, betPerPayline, freeSpinsRemaining, actionGameSpins, sessionId, isTurboMode, numReels, numRows, toast, betAmount, playSpinSound, stopSpinSound, playReelStopSound, playWinSound, playBigWinSound, playFreeSpinsTriggerSound, getWinningFeedback]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore if user is typing in an input field
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      const key = event.key.toUpperCase();
+
+      // "S" key - Spin
+      if (key === 'S') {
+        event.preventDefault();
+        if (!isSpinning && sessionId) {
+          // Check if button would be disabled
+          if (balance >= totalBet || freeSpinsRemaining > 0 || actionGameSpins > 0) {
+            spin();
+          }
+        }
+      }
+
+      // "T" key - Toggle Turbo
+      if (key === 'T') {
+        event.preventDefault();
+        setIsTurboMode(prev => !prev);
+        playClickSound();
+      }
+
+      // "A" key - Auto Spin (show autoplay dialog)
+      if (key === 'A') {
+        event.preventDefault();
+        if (!autoplayState.isActive) {
+          setShowAutoplayDialog(true);
+        } else {
+          // If autoplay is active, stop it
+          stopAutoplay();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSpinning, sessionId, balance, totalBet, freeSpinsRemaining, actionGameSpins, spin, playClickSound, autoplayState.isActive, stopAutoplay]);
 
   // Autoplay effect - handles automatic spinning with stop conditions
   useEffect(() => {
@@ -759,9 +845,10 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline }: SlotMach
           // For base game wins: show if within the winning count
           if (isShowingFeatureGameWins) {
             // Feature game: only show if:
-            // 1. This reel is expanded
+            // 1. This reel is expanded (must be in reelsToExpand)
             // 2. The symbol at this position is the feature symbol (expanded symbols are all feature symbol)
-            if (reelsToExpand.includes(reelIndex) && gridSymbol === line.symbol) {
+            // 3. The winning line symbol matches the feature symbol (double-check)
+            if (reelsToExpand.includes(reelIndex) && gridSymbol === featureSymbol && line.symbol === featureSymbol) {
               acc.push(line.paylineIndex);
             }
           } else {

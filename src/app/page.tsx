@@ -44,6 +44,22 @@ export default function Home() {
   const [betAmount, setBetAmount] = useState(betAmounts[0] || 1.00);
   
   /**
+   * Free spins state - managed here to share with MiddleSection
+   * - isFreeSpinsMode: Whether currently in free spins mode
+   * - featureSymbol: The expanding symbol selected for free spins
+   */
+  const [isFreeSpinsMode, setIsFreeSpinsMode] = useState(false);
+  const [featureSymbol, setFeatureSymbol] = useState<string>('');
+  
+  /**
+   * Callback to handle free spins state changes from SlotMachine
+   */
+  const handleFreeSpinsStateChange = (isFreeSpins: boolean, symbol: string) => {
+    setIsFreeSpinsMode(isFreeSpins);
+    setFeatureSymbol(symbol);
+  };
+  
+  /**
    * Static configuration
    * - numPaylines: Always 5 paylines (fixed for this game)
    * - betPerPayline: Calculated as betAmount divided by numPaylines
@@ -54,12 +70,17 @@ export default function Home() {
 
   return (
     <div className="game-container">
-      <TopSection />
-      <MiddleSection betAmount={betAmount} />
+      <TopSection 
+        betAmount={betAmount} 
+        isFreeSpinsMode={isFreeSpinsMode}
+        featureSymbol={featureSymbol}
+      />
+      <MiddleSection />
       <BottomSection 
         betAmount={betAmount} 
         setBetAmount={setBetAmount} 
-        betPerPayline={betPerPayline} 
+        betPerPayline={betPerPayline}
+        onFreeSpinsStateChange={handleFreeSpinsStateChange}
       />
     </div>
   );

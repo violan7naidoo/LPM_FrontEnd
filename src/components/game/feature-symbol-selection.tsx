@@ -7,13 +7,13 @@
  * 
  * Features:
  * - Symbol spinning animation (cycles through all eligible symbols)
- * - 30 spins before stopping on selected symbol
+ * - 50 spins before stopping on selected symbol
  * - Reveal animation (scale-in and pulse-glow)
  * - Free spins count display
  * - Full-screen overlay with golden theme
  * 
  * Animation Flow:
- * 1. Component opens → symbols start spinning (30 spins)
+ * 1. Component opens → symbols start spinning (50 spins)
  * 2. Symbols cycle through all eligible symbols (excluding Scatter)
  * 3. Animation stops on selected symbol
  * 4. Brief pause → reveal animation plays
@@ -70,7 +70,7 @@ export function FeatureSymbolSelection({
       // Cycle through all symbols in order, then stop on selected symbol
       let currentIndex = 0;
       let spinCount = 0;
-      const totalSpins = 30; // Double the spins (was 15)
+      const totalSpins = 50; // Increased spins for longer animation
       const selectedSymbolIndex = eligibleSymbols.indexOf(selectedSymbol);
       
       const spinInterval = setInterval(() => {
@@ -96,7 +96,7 @@ export function FeatureSymbolSelection({
             }, 3000); // Display time after selection animation
           }, 500);
         }
-      }, 100); // Keep same interval speed
+      }, 80); // Faster interval for smoother animation (80ms per symbol)
       
       return () => clearInterval(spinInterval);
     }
@@ -129,7 +129,7 @@ export function FeatureSymbolSelection({
               {spinningSymbols.map((symbol, index) => (
                 <div
                   key={index}
-                  className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 bg-white/20 rounded-lg border-4 border-yellow-400 flex items-center justify-center animate-pulse shadow-2xl transition-all duration-100"
+                  className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 bg-white/20 rounded-lg border-4 border-yellow-400 flex items-center justify-center animate-pulse shadow-2xl transition-all duration-80"
                 >
                   {symbol && (
                     <Image

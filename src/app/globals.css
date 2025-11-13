@@ -258,6 +258,7 @@
   width: 1296px;   /* Fixed width for vertical cabinet (20% larger than original 1080px) */
   height: 2550px;  /* Fixed height (increased to fit control panel without cutoff) */
   margin: auto;    /* Centers container horizontally */
+  padding-top:200px; /* Push all sections down slightly */
   background: url('/images/backround/bg.png') no-repeat center center;
   background-size: cover;
   display: flex;

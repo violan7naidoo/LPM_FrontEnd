@@ -165,18 +165,8 @@ export function ControlPanel({
   onStopAutoplay,
   onShowAutoplayDialog,
 }: ControlPanelProps) {
-  // Load game configuration to access symbol images
+  // Load game configuration (kept for potential future use)
   const { config } = useGameConfig();
-  
-  /**
-   * Get feature symbol image for free spins mode
-   * Returns the image path for the expanding symbol during free spins
-   */
-  const featureSymbolImage = useMemo(() => {
-    if (!featureSymbol || !config?.symbols) return null;
-    const symbol = config.symbols[featureSymbol as keyof typeof config.symbols];
-    return symbol?.image || null;
-  }, [featureSymbol, config]);
 
   /**
    * Determine spin button text based on current game state
@@ -237,29 +227,7 @@ export function ControlPanel({
                 </div>
             )}
             {isFreeSpinsMode && (
-                <>
-                    <InfoDisplay label="Free Spins" value={freeSpinsRemaining} isCurrency={false} />
-                    {featureSymbol && (
-                        <div className="flex flex-col items-center justify-center p-3 md:p-4 lg:p-5 rounded-md text-center h-full info-display-bg flex-1 min-w-[120px]">
-                            <span className="text-base md:text-lg uppercase font-mono tracking-widest subtle-cyan-text mb-1">Expanding Symbol</span>
-                            <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32">
-                                {featureSymbolImage ? (
-                                    <Image
-                                        src={featureSymbolImage}
-                                        alt={featureSymbol}
-                                        fill
-                                        className="object-contain"
-                                        unoptimized
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-white text-sm sm:text-base md:text-lg font-bold">
-                                        {featureSymbol}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </>
+                <InfoDisplay label="Free Spins" value={freeSpinsRemaining} isCurrency={false} />
             )}
             {actionGameSpins > 0 && !isFreeSpinsMode && (
                 <InfoDisplay label="Action Spins" value={actionGameSpins} isCurrency={false} />
@@ -466,33 +434,9 @@ export function ControlPanel({
                     </>
                 )}
                 {isFreeSpinsMode && (
-                    <>
-                        <div className="flex-1">
-                            <MobileInfoDisplay label="Free Spins" value={freeSpinsRemaining} isCurrency={false} />
-                        </div>
-                        {featureSymbol && (
-                            <div className="flex-1">
-                                <div className="flex flex-col items-center justify-center p-1 rounded-md text-center min-h-[48px] info-display-bg">
-                                    <span className="text-[8px] uppercase font-mono tracking-widest subtle-cyan-text">Expanding</span>
-                                    <div className="relative w-8 h-8 mt-0.5">
-                                        {featureSymbolImage ? (
-                                            <Image
-                                                src={featureSymbolImage}
-                                                alt={featureSymbol}
-                                                fill
-                                                className="object-contain"
-                                                unoptimized
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-white text-[8px] font-bold">
-                                                {featureSymbol}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </>
+                    <div className="flex-1">
+                        <MobileInfoDisplay label="Free Spins" value={freeSpinsRemaining} isCurrency={false} />
+                    </div>
                 )}
                 {actionGameSpins > 0 && !isFreeSpinsMode && (
                     <div className="flex-1">

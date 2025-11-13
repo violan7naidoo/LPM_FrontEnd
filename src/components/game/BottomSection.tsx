@@ -33,9 +33,10 @@ interface BottomSectionProps {
   betAmount: number;
   setBetAmount: (amount: number) => void;
   betPerPayline: number;
+  onFreeSpinsStateChange?: (isFreeSpinsMode: boolean, featureSymbol: string) => void;
 }
 
-export function BottomSection({ betAmount, setBetAmount, betPerPayline }: BottomSectionProps) {
+export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange }: BottomSectionProps) {
   return (
     // Main container: flex-[3] means this section takes 3/6 (half) of the vertical space
     // flex flex-col: Vertical flex layout
@@ -56,6 +57,7 @@ export function BottomSection({ betAmount, setBetAmount, betPerPayline }: Bottom
           betAmount={betAmount}
           setBetAmount={setBetAmount}
           betPerPayline={betPerPayline}
+          onFreeSpinsStateChange={onFreeSpinsStateChange}
         />
       </div>
     </div>
