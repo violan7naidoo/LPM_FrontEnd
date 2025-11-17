@@ -55,11 +55,13 @@ function PayCell({
   betKey,
   config,
   hidePayouts = [],
+  alignRight = false,
 }: {
   symbolId: string;
   betKey: string;
   config: FrontendGameConfig;
   hidePayouts?: number[];
+  alignRight?: boolean;
 }) {
   // Retrieve the symbol configuration from the game config
   // Returns null if symbol doesn't exist (prevents rendering errors)
@@ -108,9 +110,14 @@ function PayCell({
   // Render the paytable cell with symbol image and payout information
   return (
     // Background block: semi-transparent black with yellow border
-    // p-6 = 24px padding, border-4 = 4px border, rounded-lg = 8px border radius
-    // w-[420px]: Fixed width to allow blocks to meet in the middle with proper spacing
-    <div className="bg-black/40 rounded-lg p-6 border-4 border-yellow-400/50 w-[420px]">
+    // p-6 = 24px padding, border-4 = 4px border
+    // w-[720px]: Fixed width for rows 2, 3, 4 (420px + 200px + 100px)
+    // Conditional rounded corners: left blocks round left, right blocks round right, no outer border
+    <div className={`bg-black/40 p-6 border-4 border-yellow-400/50 w-[720px] ${
+      alignRight 
+        ? 'rounded-r-lg rounded-l-none border-l-0' 
+        : 'rounded-l-lg rounded-r-none border-r-0'
+    }`}>
       {/* Flex container: symbol image on left, payouts on right */}
       <div className="flex items-center gap-8">
         <Image
@@ -153,11 +160,13 @@ function LowPayCell({
   betKey,
   config,
   hidePayouts = [],
+  alignRight = false,
 }: {
   symbolIds: string[];
   betKey: string;
   config: FrontendGameConfig;
   hidePayouts?: number[];
+  alignRight?: boolean;
 }) {
   // Map symbol IDs to their configuration objects and filter out any null/undefined values
   const symbols = symbolIds.map((id) => config?.symbols?.[id]).filter(Boolean) as FrontendSymbolConfig[];
@@ -189,7 +198,11 @@ function LowPayCell({
   };
 
   return (
-    <div className="bg-black/40 rounded-lg p-6 border-4 border-yellow-400/50 w-[600px]">
+    <div className={`bg-black/40 p-6 border-4 border-yellow-400/50 w-[720px] ${
+      alignRight 
+        ? 'rounded-r-lg rounded-l-none border-l-0' 
+        : 'rounded-l-lg rounded-r-none border-r-0'
+    }`}>
       <div className="flex items-center gap-4">
         <div className="flex flex-shrink-0">
           {symbols.map((symbol, index) => (
@@ -298,10 +311,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
      * - overflow-hidden: Prevents content from overflowing into other sections
      */
     <div
-     className="flex-[1.3] flex items-start justify-center bg-black/20 border-b-2 border-primary/30 pt-0 pb-4 relative overflow-hidden px-0"
+     className="flex-[1.0] flex items-start justify-start bg-transparent pt-0 pb-0 relative overflow-visible px-0"
       style={{
-        background:
-          'radial-gradient(circle, rgba(0,20,50,0.5) 0%, rgba(0,10,30,0.5) 100%)',
+        width: '100%',
+        minWidth: '100%',
       }}
     >
       {/* 
@@ -309,19 +322,20 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
         - grid-cols-2: 2 columns layout
         - gap-x-6: 24px horizontal gap between columns (reduced from 48px)
         - gap-y-4: 16px vertical gap between rows (reduced from 24px)
-        - w-full: Full width to extend closer to edges
+        - w-full: Full width to extend to extreme edges
         - relative: Allows absolute positioning of center overlay
         - scale-75: Scales down the entire paytable to 75% to fit within top section
         - origin-top: Scales from top to position at the very top of the section
         - z-10: Ensure paytable appears above middle section content
+        - No horizontal padding/margin to extend to edges
       */}
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4 w-full relative scale-75 origin-top z-10">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4 relative z-10 scale-75 origin-top-left" style={{ width: '133.33%', minWidth: '133.33%', maxWidth: 'none' }}>
         {/* 
           Row 1 (Top): Scatter and SUBSTITUTES FOR combined in one long block
           - col-span-2: Spans both columns of the grid
           - This creates a single wide block at the top
         */}
-        <div className="col-span-2 bg-black/40 rounded-lg p-6 border-4 border-yellow-400/50">
+        <div className="col-span-2 bg-black/40 rounded-none p-6 border-4 border-yellow-400/50 border-l-0 border-r-0 w-full">
           {/* Flex container: Scatter on left, SUBSTITUTES FOR on right */}
           <div className="flex items-center justify-between gap-8">
             {/* Scatter section on left side of the block */}
@@ -418,53 +432,49 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
 
         {/* 
           Row 2: Queen (left) and Stone (right)
-          - w-fit: Constrains block width to content (prevents excessive width)
-          - Right column uses flex justify-end to align block to the right
+          - Left block: Starts at left edge
+          - Right block: Aligned to right edge with space in middle
         */}
-        <div className="w-fit">
-          <PayCell symbolId={queenSymbol} betKey={betKey} config={config} />
+        <div className="w-full">
+          <PayCell symbolId={queenSymbol} betKey={betKey} config={config} alignRight={false} />
         </div>
-        <div className="flex justify-end">
-          <div className="w-fit">
-            <PayCell symbolId={stoneSymbol} betKey={betKey} config={config} />
-          </div>
+        <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
+          <PayCell symbolId={stoneSymbol} betKey={betKey} config={config} alignRight={true} />
         </div>
 
         {/* 
           Row 3: Wolf (left) and Leopard (right)
-          Same layout structure as Row 2
+          - Left block: Starts at left edge
+          - Right block: Aligned to right edge with space in middle
         */}
-        <div className="w-fit">
-          <PayCell symbolId={wolfSymbol} betKey={betKey} config={config} />
+        <div className="w-full">
+          <PayCell symbolId={wolfSymbol} betKey={betKey} config={config} alignRight={false} />
         </div>
-        <div className="flex justify-end">
-          <div className="w-fit">
-            <PayCell symbolId={leopardSymbol} betKey={betKey} config={config} />
-          </div>
+        <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
+          <PayCell symbolId={leopardSymbol} betKey={betKey} config={config} alignRight={true} />
         </div>
 
         {/* 
           Row 4 (Bottom): Low-pay card symbols
-          - Left: A and K symbols grouped together
-          - Right: Q, J, and 10 symbols grouped together (right-aligned)
-          - Both blocks have same width (500px) and meet in the middle with spacing
+          - Left: A and K symbols grouped together (starts at left edge)
+          - Right: Q, J, and 10 symbols grouped together (aligned to right edge with space in middle)
           - LowPayCell handles multiple symbols with shared payouts
         */}
-        <div className="w-fit">
+        <div className="w-full">
           <LowPayCell
             symbolIds={['A', 'K']}
             betKey={betKey}
             config={config}
+            alignRight={false}
           />
         </div>
-        <div className="flex justify-end">
-          <div className="w-fit">
-            <LowPayCell
-              symbolIds={['Q', 'J', '10']}
-              betKey={betKey}
-              config={config}
-            />
-          </div>
+        <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
+          <LowPayCell
+            symbolIds={['Q', 'J', '10']}
+            betKey={betKey}
+            config={config}
+            alignRight={true}
+          />
         </div>
 
         {/* 

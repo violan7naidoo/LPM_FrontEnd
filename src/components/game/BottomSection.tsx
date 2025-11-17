@@ -42,7 +42,7 @@ export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSp
     // flex flex-col: Vertical flex layout
     // overflow-hidden: Prevents content from spilling outside container
     // justify-end: Aligns content to the bottom so control panel ends at screen bottom
-    <div className="flex-[1.9] flex flex-col w-full h-full overflow-hidden justify-end">
+    <div className="flex-[2.3] flex flex-col w-full h-full overflow-hidden justify-end">
       {/* Wrapper for SlotMachine - ensures full width */}
       <div className="w-full">
         {/* 
