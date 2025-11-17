@@ -115,8 +115,8 @@ function PayCell({
     // Conditional rounded corners: left blocks round left, right blocks round right, no outer border
     <div className={`bg-black/40 p-6 border-4 border-yellow-400/50 w-[720px] ${
       alignRight 
-        ? 'rounded-r-lg rounded-l-none border-l-0' 
-        : 'rounded-l-lg rounded-r-none border-r-0'
+        ? 'rounded-r-lg rounded-l-none' 
+        : 'rounded-l-lg rounded-r-none'
     }`}>
       {/* Flex container: symbol image on left, payouts on right */}
       <div className="flex items-center gap-8">
@@ -200,8 +200,8 @@ function LowPayCell({
   return (
     <div className={`bg-black/40 p-6 border-4 border-yellow-400/50 w-[720px] ${
       alignRight 
-        ? 'rounded-r-lg rounded-l-none border-l-0' 
-        : 'rounded-l-lg rounded-r-none border-r-0'
+        ? 'rounded-r-lg rounded-l-none' 
+        : 'rounded-l-lg rounded-r-none'
     }`}>
       <div className="flex items-center gap-4">
         <div className="flex flex-shrink-0">
@@ -335,7 +335,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
           - col-span-2: Spans both columns of the grid
           - This creates a single wide block at the top
         */}
-        <div className="col-span-2 bg-black/40 rounded-none p-6 border-4 border-yellow-400/50 border-l-0 border-r-0 w-full">
+        <div className="col-span-2 bg-black/40 rounded-none p-6 border-4 border-yellow-400/50 w-full">
           {/* Flex container: Scatter on left, SUBSTITUTES FOR on right */}
           <div className="flex items-center justify-between gap-8">
             {/* Scatter section on left side of the block */}
@@ -487,7 +487,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
           - This overlay appears on top of the grid, showing the special feature information
         */}
         {isFreeSpinsMode && featureSymbol ? (
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px]">
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
             <p className="text-yellow-400 font-bold text-2xl mb-4">EXPANDING SYMBOL</p>
             {config?.symbols?.[featureSymbol]?.image ? (
               <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 flex items-center justify-center">
