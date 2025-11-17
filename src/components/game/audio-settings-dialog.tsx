@@ -60,8 +60,8 @@ export function AudioSettingsDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="rounded-full w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 p-1 bg-black/30 hover:bg-black/50 transition-colors">
-          <Volume2 className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 text-white" />
+        <Button variant="secondary" className="rounded-full w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 p-1 bg-black/30 hover:bg-black/50 transition-colors">
+          <Volume2 className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-white" />
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-md h-auto bg-background/95 backdrop-blur-sm p-0 flex flex-col overflow-hidden">

@@ -38,11 +38,11 @@ interface BottomSectionProps {
 
 export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange }: BottomSectionProps) {
   return (
-    // Main container: flex-[3] means this section takes 3/6 (half) of the vertical space
+    // Main container: flex-[1.9] means this section takes 1.9/4.4 of the vertical space
     // flex flex-col: Vertical flex layout
     // overflow-hidden: Prevents content from spilling outside container
-    // justify-start: Aligns content to the top
-    <div className="flex-[1.9] flex flex-col w-full h-full overflow-hidden justify-start">
+    // justify-end: Aligns content to the bottom so control panel ends at screen bottom
+    <div className="flex-[1.9] flex flex-col w-full h-full overflow-hidden justify-end">
       {/* Wrapper for SlotMachine - ensures full width */}
       <div className="w-full">
         {/* 

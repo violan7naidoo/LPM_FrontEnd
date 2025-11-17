@@ -25,7 +25,7 @@ interface MiddleSectionProps {
  */
 export function MiddleSection({}: MiddleSectionProps) {
   return (
-    <div className="flex-[1.2] flex items-center justify-center bg-black/20 border-b-2 border-primary/30 overflow-hidden">
+    <div className="flex-[1.5] flex items-center justify-center bg-black/20 border-b-2 border-primary/30 overflow-hidden">
                     <Image
         src="/middle-section/main.png"
         alt="Middle Section"

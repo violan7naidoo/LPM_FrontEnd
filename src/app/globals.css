@@ -255,7 +255,7 @@
  * - overflow: hidden - Prevents content from spilling outside
  */
 .game-container {
-  width: 1296px;   /* Fixed width for vertical cabinet (20% larger than original 1080px) */
+  width: 1496px;   /* Fixed width for vertical cabinet (20% larger than original 1080px) */
   height: 2550px;  /* Fixed height (increased to fit control panel without cutoff) */
   margin: auto;    /* Centers container horizontally */
   padding-top: 120px; /* Space for game title */
