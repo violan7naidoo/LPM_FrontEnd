@@ -126,11 +126,13 @@ export default function Home() {
 
   /**
    * Handler for action wheel completion
+   * Note: accumulatedActionWin is NOT reset here - it persists across all action game sessions
+   * throughout the entire game session, accumulating all action game wins from the beginning
    */
   const handleActionWheelComplete = () => {
     setShowActionWheel(false);
     setActionGameSpins(0);
-    setAccumulatedActionWin(0);
+    // DO NOT reset accumulatedActionWin - it should persist across all action game sessions
     // Balance has already been updated by backend during the last wheel spin
   };
 

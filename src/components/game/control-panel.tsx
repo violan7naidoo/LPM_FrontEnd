@@ -105,8 +105,8 @@ interface ControlPanelProps {
  */
 const InfoDisplay = ({ label, value, isCurrency = true }: { label: string; value: number | string; isCurrency?: boolean }) => (
     <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full info-display-bg flex-[3] min-w-[120px]">
-        <span className="text-5xl md:text-6xl uppercase tracking-widest subtle-cyan-text mb-0" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
-        <span className="text-5xl md:text-6xl font-bold cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif' }}>
+        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
+        <span className="text-6xl font-bold cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif' }}>
             {isCurrency ? `R${value}` : value}
         </span>
     </div>
@@ -174,12 +174,12 @@ export function ControlPanel({
             {/* Bet Amount */}
             {!isFreeSpinsMode && (
                 <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full info-display-bg flex-[3] min-w-[120px]">
-                    <span className="text-5xl md:text-6xl uppercase tracking-widest subtle-cyan-text mb-0" style={{ fontFamily: 'Cinzel, serif' }}>Bet</span>
+                    <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0" style={{ fontFamily: 'Cinzel, serif' }}>Bet</span>
                     <div className="flex items-center gap-1 justify-center w-full">
                         <Button variant="ghost" size="icon" className="h-12 w-12 md:h-16 md:w-16 hover:text-cyan-200 bet-button-icon" onClick={onIncreaseBet} disabled={isSpinning}>
                             <Plus className="h-8 w-8 md:h-10 md:w-10" />
                         </Button>
-                        <span className="text-5xl md:text-6xl font-bold px-1 cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif' }}>
+                        <span className="text-6xl font-bold px-1 cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif' }}>
                             R{totalBet.toFixed(2)}
                         </span>
                         <Button variant="ghost" size="icon" className="h-12 w-12 md:h-16 md:w-16 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>

@@ -222,7 +222,7 @@ function LowPayCell({
             />
           ))}
         </div>
-        <div className="text-3xl font-bold leading-tight text-white w-[170px] flex-shrink-0">
+        <div className="text-3xl font-bold leading-tight text-white w-[230px] flex-shrink-0">
           {formatPayout(5)}
           {formatPayout(4)}
           {formatPayout(3)}

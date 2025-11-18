@@ -825,9 +825,9 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         // Base game: if free spins also triggered, wait; otherwise show wheel immediately
         if (!response.player.results.scatterWin.triggeredFreeSpins) {
           // No free spins triggered, show wheel immediately
-          // In base game, backend adds actionGameWin to balance immediately, so accumulatedWin should be 0
+          // Use backend's accumulated value to persist across all action game sessions
           if (onActionWheelStateChange) {
-            onActionWheelStateChange(true, response.actionGameSpins, 0);
+            onActionWheelStateChange(true, response.actionGameSpins, backendAccumulatedWin);
           }
         } else {
           // Free spins triggered, use backend's accumulated value (don't show wheel yet)
