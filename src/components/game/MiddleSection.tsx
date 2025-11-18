@@ -209,7 +209,7 @@ export function MiddleSection({
           className="absolute object-contain"
           style={{ 
             display: imagesLoaded ? 'block' : 'none',
-            top: '150px',
+            top: '130px',
             left: 0,
             right: 0,
             width: '100%',
