@@ -1,7 +1,8 @@
 /**
  * MiddleSection Component
  * 
- * This component displays an image/video in the middle section of the game.
+ * This component displays an animated sequence of 121 images in the middle section of the game.
+ * The animation loops continuously at 24 FPS.
  * The paytable has been moved to TopSection.
  * Can also display the Action Wheel when action games are triggered.
  * Can also display the Feature Symbol Selection when free spins are triggered.
@@ -9,8 +10,7 @@
 
 'use client';
 
-import { useRef } from 'react';
-import Image from 'next/image';
+import { useRef, useEffect, useState } from 'react';
 import { ActionWheel, ActionWheelHandle } from './action-wheel';
 import { FeatureSymbolSelection } from './feature-symbol-selection';
 
@@ -54,9 +54,135 @@ export function MiddleSection({
   onFeatureSymbolSelectionComplete,
 }: MiddleSectionProps) {
   const actionWheelRef = useRef<ActionWheelHandle>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const animationFrameRef = useRef<number>();
+  const currentFrameRef = useRef<number>(0);
+  const lastFrameTimeRef = useRef<number>(0);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  
+  const totalFrames = 121;
+  const fps = 24;
+  const frameInterval = 1000 / fps; // ~41.67ms per frame
+
+  // Preload all 121 images
+  useEffect(() => {
+    if (showFeatureSymbolSelection || showActionWheel) return;
+    
+    const loadImages = async () => {
+      const imagePromises: Promise<HTMLImageElement>[] = [];
+      
+      for (let i = 1; i <= totalFrames; i++) {
+        const img = new Image();
+        const promise = new Promise<HTMLImageElement>((resolve, reject) => {
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = `/idle/Idle_${i}.webp`;
+        });
+        imagePromises.push(promise);
+      }
+      
+      try {
+        const loadedImages = await Promise.all(imagePromises);
+        imagesRef.current = loadedImages;
+        setImagesLoaded(true);
+      } catch (error) {
+        console.error('Error loading idle animation images:', error);
+      }
+    };
+    
+    loadImages();
+  }, [showFeatureSymbolSelection, showActionWheel]);
+
+  // Animation loop
+  useEffect(() => {
+    if (!imagesLoaded || showFeatureSymbolSelection || showActionWheel) return;
+    
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Set canvas size to match container
+    const resizeCanvas = () => {
+      const rect = container.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    };
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Animation function
+    const animate = (currentTime: number) => {
+      if (!imagesLoaded || imagesRef.current.length === 0) return;
+      
+      // Initialize lastFrameTime on first frame
+      if (lastFrameTimeRef.current === 0) {
+        lastFrameTimeRef.current = currentTime;
+      }
+      
+      // Calculate elapsed time since last frame
+      const elapsed = currentTime - lastFrameTimeRef.current;
+      
+      // Advance frame if enough time has passed
+      if (elapsed >= frameInterval) {
+        currentFrameRef.current = (currentFrameRef.current + 1) % totalFrames;
+        lastFrameTimeRef.current = currentTime;
+        
+        // Draw current frame
+        const currentImage = imagesRef.current[currentFrameRef.current];
+        if (currentImage && currentImage.complete) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          // Calculate aspect ratio and scaling
+          const imgAspect = currentImage.width / currentImage.height;
+          const canvasAspect = canvas.width / canvas.height;
+          
+          let drawWidth = canvas.width;
+          let drawHeight = canvas.height;
+          let offsetX = 0;
+          let offsetY = 0;
+          
+          if (imgAspect > canvasAspect) {
+            // Image is wider - fit to height
+            drawHeight = canvas.height;
+            drawWidth = drawHeight * imgAspect;
+            offsetX = (canvas.width - drawWidth) / 2;
+          } else {
+            // Image is taller - fit to width
+            drawWidth = canvas.width;
+            drawHeight = drawWidth / imgAspect;
+            offsetY = (canvas.height - drawHeight) / 2;
+          }
+          
+          ctx.drawImage(currentImage, offsetX, offsetY, drawWidth, drawHeight);
+        }
+      }
+      
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+    
+    // Start animation
+    animationFrameRef.current = requestAnimationFrame(animate);
+    
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [imagesLoaded, showFeatureSymbolSelection, showActionWheel, frameInterval]);
 
   return (
-    <div className="flex-[1.4] flex items-center justify-center bg-transparent overflow-visible relative" style={{ marginTop: '-180px' }}>
+    <div 
+      ref={containerRef}
+      className="flex-[1.4] flex items-center justify-center bg-transparent overflow-visible relative" 
+      style={{ marginTop: '-180px' }}
+    >
       {showFeatureSymbolSelection ? (
         <div className="w-full h-full flex items-center justify-center">
           <FeatureSymbolSelection
@@ -78,14 +204,10 @@ export function MiddleSection({
           onWin={onActionWheelWin}
         />
       ) : (
-        <Image
-          src="/middle-section/main.png"
-          alt="Middle Section"
-          width={1296}
-          height={637}
-          className="object-cover w-full h-full"
-          unoptimized
-          priority
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full object-contain"
+          style={{ display: imagesLoaded ? 'block' : 'none' }}
         />
       )}
     </div>
