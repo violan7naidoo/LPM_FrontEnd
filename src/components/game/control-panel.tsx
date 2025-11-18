@@ -105,8 +105,8 @@ interface ControlPanelProps {
  */
 const InfoDisplay = ({ label, value, isCurrency = true }: { label: string; value: number | string; isCurrency?: boolean }) => (
     <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full info-display-bg flex-[3] min-w-[120px]">
-        <span className="text-5xl md:text-6xl uppercase font-mono tracking-widest subtle-cyan-text mb-0">{label}</span>
-        <span className="text-5xl md:text-6xl font-bold font-mono cyan-text-glow leading-none">
+        <span className="text-5xl md:text-6xl uppercase tracking-widest subtle-cyan-text mb-0" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
+        <span className="text-5xl md:text-6xl font-bold cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif' }}>
             {isCurrency ? `R${value}` : value}
         </span>
     </div>
@@ -124,8 +124,8 @@ const InfoDisplay = ({ label, value, isCurrency = true }: { label: string; value
  */
 const MobileInfoDisplay = ({ label, value, isCurrency = true }: { label: string; value: number | string; isCurrency?: boolean }) => (
     <div className="flex flex-col items-center justify-center p-1 rounded-md w-full text-center min-h-[48px] info-display-bg">
-        <span className="text-[10px] uppercase font-mono tracking-widest subtle-cyan-text">{label}</span>
-        <span className="text-base font-bold font-mono cyan-text-glow">
+        <span className="text-[10px] uppercase tracking-widest subtle-cyan-text" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
+        <span className="text-base font-bold cyan-text-glow" style={{ fontFamily: 'Cinzel, serif' }}>
             {isCurrency ? `R${value}` : value}
         </span>
     </div>
@@ -169,17 +169,17 @@ export function ControlPanel({
         {/* Desktop layout - single horizontal line */}
         <div className="hidden sm:flex items-stretch justify-between gap-0 h-full min-h-[120px] md:min-h-[140px] lg:min-h-[160px]">
             {/* Balance */}
-            <InfoDisplay label="Balance" value={balance.toFixed(2)} />
+            <InfoDisplay label="Balance" value={(balance ?? 0).toFixed(2)} />
             
             {/* Bet Amount */}
             {!isFreeSpinsMode && (
                 <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full info-display-bg flex-[3] min-w-[120px]">
-                    <span className="text-5xl md:text-6xl uppercase font-mono tracking-widest subtle-cyan-text mb-0">Bet</span>
+                    <span className="text-5xl md:text-6xl uppercase tracking-widest subtle-cyan-text mb-0" style={{ fontFamily: 'Cinzel, serif' }}>Bet</span>
                     <div className="flex items-center gap-1 justify-center w-full">
                         <Button variant="ghost" size="icon" className="h-12 w-12 md:h-16 md:w-16 hover:text-cyan-200 bet-button-icon" onClick={onIncreaseBet} disabled={isSpinning}>
                             <Plus className="h-8 w-8 md:h-10 md:w-10" />
                         </Button>
-                        <span className="text-5xl md:text-6xl font-bold font-mono px-1 cyan-text-glow leading-none">
+                        <span className="text-5xl md:text-6xl font-bold px-1 cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif' }}>
                             R{totalBet.toFixed(2)}
                         </span>
                         <Button variant="ghost" size="icon" className="h-12 w-12 md:h-16 md:w-16 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
@@ -196,7 +196,7 @@ export function ControlPanel({
             )}
 
             {/* Win */}
-            <InfoDisplay label="Win" value={lastWin.toFixed(2)} />
+            <InfoDisplay label="Win" value={(lastWin ?? 0).toFixed(2)} />
         
             {/* Info and Audio Settings */}
             <div className="flex items-center justify-center gap-2 p-0 rounded-md text-center h-full info-display-bg flex-[1] min-w-[120px]">
@@ -217,18 +217,18 @@ export function ControlPanel({
             {/* Top row: Win, Bet */}
             <div className="flex gap-2">
                 <div className="flex-1">
-                    <MobileInfoDisplay label="Win" value={lastWin.toFixed(2)} />
+                    <MobileInfoDisplay label="Win" value={(lastWin ?? 0).toFixed(2)} />
                 </div>
                 {!isFreeSpinsMode && (
                     <>
                         <div className="flex-1">
                             <div className="flex flex-col items-center justify-center p-1 rounded-md text-center min-h-[48px] info-display-bg">
-                                <span className="text-[8px] uppercase font-mono tracking-widest subtle-cyan-text">Bet</span>
+                                <span className="text-[8px] uppercase tracking-widest subtle-cyan-text" style={{ fontFamily: 'Cinzel, serif' }}>Bet</span>
                                 <div className="flex items-center gap-0.5 justify-center w-full mt-0.5">
                                     <Button variant="ghost" size="icon" className="h-4 w-4 hover:text-cyan-200 bet-button-icon" onClick={onIncreaseBet} disabled={isSpinning}>
                                         <Plus className="h-3 w-3" />
                                     </Button>
-                                    <span className="text-sm font-bold font-mono px-1 cyan-text-glow">
+                                    <span className="text-sm font-bold px-1 cyan-text-glow" style={{ fontFamily: 'Cinzel, serif' }}>
                                         R{totalBet.toFixed(2)}
                                     </span>
                                     <Button variant="ghost" size="icon" className="h-4 w-4 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
@@ -254,7 +254,7 @@ export function ControlPanel({
             {/* Bottom row: Balance and Pay Table/Music */}
             <div className="flex gap-2">
                 <div className="flex-1">
-                    <MobileInfoDisplay label="Balance" value={balance.toFixed(2)} />
+                    <MobileInfoDisplay label="Balance" value={(balance ?? 0).toFixed(2)} />
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center justify-center gap-2 p-1 rounded-md text-center min-h-[48px] info-display-bg">

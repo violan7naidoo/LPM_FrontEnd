@@ -29,6 +29,11 @@ interface TopSectionProps {
   betAmount: number;
   isFreeSpinsMode?: boolean;
   featureSymbol?: string;
+  showActionWheel?: boolean;
+  actionGameWinMessage?: string;
+  actionGameWinAmount?: number;
+  actionGamesFinished?: boolean;
+  showFeatureGameWins?: boolean; // Used for other feature game win logic (not currently used for expanding symbol display)
 }
 
 /**
@@ -115,11 +120,11 @@ function PayCell({
     // Conditional rounded corners: left blocks round left, right blocks round right, no outer border
     <div className={`bg-black/40 p-6 border-4 border-yellow-400/50 w-[720px] ${
       alignRight 
-        ? 'rounded-r-lg rounded-l-none' 
+        ? 'rounded-r-lg rounded-l-none flex justify-end' 
         : 'rounded-l-lg rounded-r-none'
     }`}>
-      {/* Flex container: symbol image on left, payouts on right */}
-      <div className="flex items-center gap-8">
+      {/* Flex container: symbol image on left, payouts on right (or reversed for right-aligned) */}
+      <div className={`flex items-center ${alignRight ? 'flex-row-reverse gap-2' : 'gap-8'}`}>
         <Image
           src={symbol.image}
           alt={symbol.name}
@@ -200,10 +205,10 @@ function LowPayCell({
   return (
     <div className={`bg-black/40 p-6 border-4 border-yellow-400/50 w-[720px] ${
       alignRight 
-        ? 'rounded-r-lg rounded-l-none' 
+        ? 'rounded-r-lg rounded-l-none flex justify-end' 
         : 'rounded-l-lg rounded-r-none'
     }`}>
-      <div className="flex items-center gap-4">
+      <div className={`flex items-center ${alignRight ? 'flex-row-reverse gap-1' : 'gap-4'}`}>
         <div className="flex flex-shrink-0">
           {symbols.map((symbol, index) => (
             <Image
@@ -217,7 +222,7 @@ function LowPayCell({
             />
           ))}
         </div>
-        <div className="text-3xl font-bold leading-tight text-white w-[240px] flex-shrink-0">
+        <div className="text-3xl font-bold leading-tight text-white w-[170px] flex-shrink-0">
           {formatPayout(5)}
           {formatPayout(4)}
           {formatPayout(3)}
@@ -246,7 +251,7 @@ function LowPayCell({
  * - Grid: 2 columns, 4 rows with spacing
  * - Overlay: "10 PENNY GAMES" block positioned absolutely in center
  */
-export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }: TopSectionProps) {
+export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, showActionWheel = false, actionGameWinMessage, actionGameWinAmount, actionGamesFinished = false, showFeatureGameWins = false }: TopSectionProps) {
   // Load game configuration from context/hook
   // This contains all symbol data, payouts, and action games
   const { config } = useGameConfig();
@@ -478,7 +483,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
         </div>
 
         {/* 
-          Center Feature: Shows either "10 PENNY GAMES" or the Feature Symbol
+          Center Feature: Shows either "10 PENNY GAMES", the Feature Symbol, or Action Game Win Message
           - absolute: Positioned absolutely within the relative grid container
           - left-1/2 top-1/2: Centers horizontally and vertically
           - transform -translate-x-1/2 -translate-y-1/2: Adjusts for element's own width/height
@@ -486,7 +491,23 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
           - min-h-[350px]: Minimum height of 350px to ensure visibility
           - This overlay appears on top of the grid, showing the special feature information
         */}
-        {isFreeSpinsMode && featureSymbol ? (
+        {actionGamesFinished ? (
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
+            <p className="text-yellow-400 font-bold text-3xl">ACTION GAMES FINISHED</p>
+          </div>
+        ) : showActionWheel && actionGameWinMessage ? (
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
+            <p className="text-yellow-400 font-bold text-2xl sm:text-3xl md:text-4xl mb-4 text-center">
+              {actionGameWinMessage}
+            </p>
+            {actionGameWinAmount && actionGameWinAmount > 0 && (
+              <p className="text-yellow-400 font-bold text-3xl sm:text-4xl md:text-5xl">
+                R {actionGameWinAmount.toFixed(2)}
+              </p>
+            )}
+          </div>
+        ) : isFreeSpinsMode && featureSymbol ? (
+          // Show expanding symbol during free spins (not just after expansion)
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
             <p className="text-yellow-400 font-bold text-2xl mb-4">EXPANDING SYMBOL</p>
             {config?.symbols?.[featureSymbol]?.image ? (
@@ -503,6 +524,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol }
             ) : (
               <p className="text-yellow-400 font-bold text-4xl mt-4">{featureSymbol}</p>
             )}
+          </div>
+        ) : showActionWheel ? (
+          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
+            <p className="text-yellow-400 font-bold text-3xl">ACTION GAMES</p>
           </div>
         ) : (
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">

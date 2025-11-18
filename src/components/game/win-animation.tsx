@@ -233,9 +233,11 @@ export function WinAnimation({ feedback, onAnimationComplete, onCountComplete }:
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-headline text-yellow-400 drop-shadow-lg leading-tight mb-2">
                 {feedback.feedbackText}
             </h2>
-            <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-yellow-400 drop-shadow-lg">
-                R {displayAmount.toFixed(2)}
-            </p>
+            {feedback.winAmount > 0 && (
+              <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-yellow-400 drop-shadow-lg">
+                  R {displayAmount.toFixed(2)}
+              </p>
+            )}
         </div>
       </div>
        <style jsx>{`

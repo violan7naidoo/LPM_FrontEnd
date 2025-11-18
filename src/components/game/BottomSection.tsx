@@ -34,9 +34,20 @@ interface BottomSectionProps {
   setBetAmount: (amount: number) => void;
   betPerPayline: number;
   onFreeSpinsStateChange?: (isFreeSpinsMode: boolean, featureSymbol: string) => void;
+  onActionWheelStateChange?: (showWheel: boolean, spins: number, accumulatedWin: number) => void;
+  onSessionIdChange?: (sessionId: string) => void;
+  onBalanceUpdateCallback?: (callback: (balance: number) => void) => void;
+  showActionWheel?: boolean;
+  actionGameSpins?: number;
+  accumulatedActionWin?: number;
+  onActionWheelSpin?: () => Promise<{ result: string; win: number; additionalSpins: number }>;
+  onActionWheelSpinTrigger?: () => void;
+  onFeatureSymbolSelectionStateChange?: (show: boolean, symbol: string, count: number) => void;
+  onFeatureGameWinsStateChange?: (showFeatureGameWins: boolean) => void;
+  showFeatureSymbolSelection?: boolean;
 }
 
-export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange }: BottomSectionProps) {
+export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange, onActionWheelStateChange, onSessionIdChange, onBalanceUpdateCallback, showActionWheel, actionGameSpins, accumulatedActionWin, onActionWheelSpin, onActionWheelSpinTrigger, onFeatureSymbolSelectionStateChange, onFeatureGameWinsStateChange, showFeatureSymbolSelection }: BottomSectionProps) {
   return (
     // Main container: flex-[1.9] means this section takes 1.9/4.4 of the vertical space
     // flex flex-col: Vertical flex layout
@@ -58,6 +69,17 @@ export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSp
           setBetAmount={setBetAmount}
           betPerPayline={betPerPayline}
           onFreeSpinsStateChange={onFreeSpinsStateChange}
+          onActionWheelStateChange={onActionWheelStateChange}
+          onSessionIdChange={onSessionIdChange}
+          onBalanceUpdateCallback={onBalanceUpdateCallback}
+          showActionWheel={showActionWheel}
+          actionGameSpins={actionGameSpins}
+          accumulatedActionWin={accumulatedActionWin}
+          onActionWheelSpin={onActionWheelSpin}
+          onActionWheelSpinTrigger={onActionWheelSpinTrigger}
+          onFeatureSymbolSelectionStateChange={onFeatureSymbolSelectionStateChange}
+          onFeatureGameWinsStateChange={onFeatureGameWinsStateChange}
+          showFeatureSymbolSelection={showFeatureSymbolSelection}
         />
       </div>
     </div>

@@ -29,8 +29,8 @@ import { GameConfigProvider } from "@/hooks/use-game-config";
  * Used for SEO and browser tab title
  */
 export const metadata: Metadata = {
-  title: 'Book of Ra',
-  description: 'An ancient Egyptian slot game experience.',
+  title: 'Snow Kingdom',
+  description: 'An epic slot game experience in the Snow Kingdom.',
 };
 
 /**
@@ -61,6 +61,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap" rel="stylesheet" />
       </head>
       {/* 
         Body with font configuration

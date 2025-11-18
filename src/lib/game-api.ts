@@ -67,6 +67,7 @@ export interface PlayResponse {
     results: SpinResult;
     actionGameSpins: number;
     featureSymbol: string;
+    accumulatedActionGameWin?: number;
   };
   game: {
     balance: number;
@@ -75,6 +76,7 @@ export interface PlayResponse {
     results: SpinResult;
     actionGameSpins: number;
     featureSymbol: string;
+    accumulatedActionGameWin?: number;
   };
   freeSpins: number;
   actionGameSpins: number;
@@ -125,6 +127,9 @@ export interface ActionGameSpinResponse {
     wheelResult: string;
   };
   remainingSpins: number;
+  accumulatedWin: number;
+  totalActionSpins: number;
+  balance: number;
 }
 
 export interface SessionResponse {
@@ -136,6 +141,7 @@ export interface SessionResponse {
     results: SpinResult;
     actionGameSpins: number;
     featureSymbol: string;
+    accumulatedActionGameWin?: number;
   };
   game: {
     balance: number;
@@ -144,6 +150,7 @@ export interface SessionResponse {
     results: SpinResult;
     actionGameSpins: number;
     featureSymbol: string;
+    accumulatedActionGameWin?: number;
   };
   freeSpins: number;
   actionGameSpins: number;
