@@ -1079,18 +1079,18 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         // If isAnimating changed during the delay, this effect will have re-run and cancelled this timer
         // But add an extra safety check just in case
         if (!isAnimating) {
-          spin().then((spinResult) => {
-            if (spinResult && checkAutoplayStopConditions(spinResult)) {
-              stopAutoplay();
-              return;
-            }
-            
-            // Decrement spins remaining
-            setAutoplayState(prev => ({
-              ...prev,
-              spinsRemaining: prev.spinsRemaining - 1,
-            }));
-          });
+        spin().then((spinResult) => {
+          if (spinResult && checkAutoplayStopConditions(spinResult)) {
+            stopAutoplay();
+            return;
+          }
+          
+          // Decrement spins remaining
+          setAutoplayState(prev => ({
+            ...prev,
+            spinsRemaining: prev.spinsRemaining - 1,
+          }));
+        });
         }
         // If isAnimating is true, skip this spin - the effect will re-run when animations complete
       }, isTurboMode ? 500 : 1000); // Delay between spins
@@ -1154,7 +1154,7 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
           // AND the symbol at that position must match the winning symbol OR be a scatter (scatters can substitute)
           // For example, if count=3 and symbol=K, only show borders on reels 0, 1, 2 where symbol=K or Scatter
           if (reelIndex < line.count && (gridSymbol === line.symbol || gridSymbol === scatterSymbol)) {
-            acc.push(line.paylineIndex);
+              acc.push(line.paylineIndex);
           }
         }
       } else if (line.paylineIndex === -1) {
@@ -1164,7 +1164,7 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         // AND only if we're not showing feature game wins (before expansion)
         if (line.count >= 3 && gridSymbol === line.symbol) {
           if (!isFreeSpinsMode || (featureSymbol !== 'Scatter' && !isShowingFeatureGameWins)) {
-            acc.push(10); // Special index for scatter
+          acc.push(10); // Special index for scatter
           }
         }
       }

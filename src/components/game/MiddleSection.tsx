@@ -206,8 +206,16 @@ export function MiddleSection({
       ) : (
         <canvas
           ref={canvasRef}
-          className="w-full h-full object-contain"
-          style={{ display: imagesLoaded ? 'block' : 'none' }}
+          className="absolute object-contain"
+          style={{ 
+            display: imagesLoaded ? 'block' : 'none',
+            top: '150px',
+            left: 0,
+            right: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 5
+          }}
         />
       )}
     </div>
