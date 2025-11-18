@@ -113,10 +113,10 @@ export function FeatureSymbolSelection({
     <div className="w-full h-full flex items-center justify-center">
       <div className="relative flex flex-col items-center justify-center p-6 sm:p-8 md:p-10 bg-gradient-to-br from-yellow-900/90 to-yellow-700/90 rounded-2xl border-4 border-yellow-400 shadow-2xl max-w-4xl w-full mx-4">
         <h2 className="text-4xl sm:text-5xl font-bold text-yellow-200 mb-6 uppercase tracking-wider text-center">
-          Free Spins!
+          Penny Spins!
         </h2>
         <p className="text-2xl sm:text-3xl text-yellow-100 mb-8 text-center">
-          {freeSpinsCount} Free Spins Awarded
+          {freeSpinsCount} Penny Spins Awarded
         </p>
         
         <div className="mb-6">

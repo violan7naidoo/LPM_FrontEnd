@@ -177,6 +177,8 @@ const getViewBox = (screen: 'xs' | 'sm' | 'md', numReels: number, numRows: numbe
 }
 
 
+
+
 export function WinningLinesDisplay({ winningLines }: WinningLinesDisplayProps) {
   // Load configuration values from hooks
   const paylines = usePaylines();
@@ -292,4 +294,3 @@ export function WinningLinesDisplay({ winningLines }: WinningLinesDisplayProps) 
     </>
   );
 }
-

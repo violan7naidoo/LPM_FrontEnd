@@ -9,7 +9,7 @@
  * - Stop conditions:
  *   - Stop on any win
  *   - Stop if single win exceeds amount
- *   - Stop on feature (free spins)
+ *   - Stop on feature (penny spins)
  *   - Stop if total loss exceeds amount
  * - Currency formatting (ZAR)
  * - Validation and start button
@@ -38,7 +38,7 @@ import { X } from "lucide-react";
  * @param numberOfSpins - Number of spins to execute automatically (1-1000)
  * @param stopOnAnyWin - Stop autoplay if any win occurs
  * @param stopOnSingleWinExceeds - Stop if a single win exceeds this amount
- * @param stopOnFeature - Stop if free spins feature is triggered
+ * @param stopOnFeature - Stop if penny spins feature is triggered
  * @param stopOnTotalLossExceeds - Stop if total loss exceeds this amount
  */
 interface AutoplaySettings {

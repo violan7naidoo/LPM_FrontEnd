@@ -83,9 +83,9 @@ export function InfoDialog({ totalBet }: InfoDialogProps = {} as InfoDialogProps
               <div className="p-4 bg-card/30 border border-muted-foreground/20 rounded-lg">
                 <h4 className="font-bold text-white mb-2">Special Features</h4>
                 <ul className="space-y-2 list-disc list-inside">
-                  <li><strong>Book Symbol:</strong> Acts as both wild and scatter. Substitutes for other symbols and triggers free spins when 3+ appear</li>
-                  <li><strong>Free Spins:</strong> Landing 3+ Book symbols awards {config?.freeSpinsAwarded || 10} free spins with an expanding symbol</li>
-                  <li><strong>Expanding Symbol:</strong> During free spins, one symbol is randomly selected to expand and cover entire reels</li>
+                  <li><strong>Book Symbol:</strong> Acts as both wild and scatter. Substitutes for other symbols and triggers penny spins when 3+ appear</li>
+                  <li><strong>Penny Spins:</strong> Landing 3+ Book symbols awards {config?.freeSpinsAwarded || 10} penny spins with an expanding symbol</li>
+                  <li><strong>Expanding Symbol:</strong> During penny spins, one symbol is randomly selected to expand and cover entire reels</li>
                   <li><strong>Action Game:</strong> Triggered by 5 {config?.actionGameTriggers ? Object.values(config.actionGameTriggers)[0]?.symbol : 'ARCHAEOLOGIST'} symbols</li>
                 </ul>
               </div>
@@ -138,7 +138,7 @@ export function InfoDialog({ totalBet }: InfoDialogProps = {} as InfoDialogProps
                   <h4 className="font-bold text-white text-lg mb-3">Scatter (Wild & Scatter)</h4>
                   <div className="mb-3">
                     <div className="text-sm text-accent font-bold mb-2">
-                      3+ Scatters = {config?.freeSpinsAwarded || 10} Free Spins
+                      3+ Scatters = {config?.freeSpinsAwarded || 10} Penny Spins
                     </div>
                     {/* Scatter Payouts */}
                     {config?.scatterPayout && (
@@ -181,7 +181,7 @@ export function InfoDialog({ totalBet }: InfoDialogProps = {} as InfoDialogProps
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    The Scatter symbol acts as both a wild and scatter. It substitutes for other symbols to create wins, and landing 3 or more anywhere on the reels awards {config?.freeSpinsAwarded || 10} free spins with a randomly selected expanding symbol.
+                    The Scatter symbol acts as both a wild and scatter. It substitutes for other symbols to create wins, and landing 3 or more anywhere on the reels awards {config?.freeSpinsAwarded || 10} penny spins with a randomly selected expanding symbol.
                   </p>
                 </div>
               </div>

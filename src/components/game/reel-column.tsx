@@ -147,7 +147,7 @@ export function ReelColumn({ symbols, isSpinning, reelIndex, winningLineIndicesF
                         key={i} 
                         symbolId={symbolId} 
                         className="w-full h-[259px] flex-shrink-0"
-                        winningLineIndices={isExpanded ? [] : winningLineIndicesForColumn[i]} // Don't show winning line highlights if entire reel is expanded
+                        winningLineIndices={winningLineIndicesForColumn[i]} // Show winning line highlights on all reels, including expanded ones
                         isExpandedReel={isExpanded} // Pass flag to show yellow border
                     />
                     ))

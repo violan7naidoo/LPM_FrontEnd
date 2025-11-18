@@ -259,9 +259,10 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
       expandingReels.some(r => r) || // Reels are expanding
       bouncingReels.some(r => r) || // Reels are bouncing
       showFeatureSymbolSelection || // Feature symbol selection is active
-      showActionWheel // Action wheel is active
+      showActionWheel || // Action wheel is active
+      showFeatureGameWins // Feature game wins are being displayed (expansion phase)
     );
-  }, [isSpinning, winningFeedback, expandingReels, bouncingReels, showFeatureSymbolSelection, showActionWheel]);
+  }, [isSpinning, winningFeedback, expandingReels, bouncingReels, showFeatureSymbolSelection, showActionWheel, showFeatureGameWins]);
   
   const handleWinAnimationComplete = useCallback(() => {
     setWinningFeedback(null);
@@ -474,16 +475,16 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
     // Store the current spin promise so we can track it
     const spinPromise = (async () => {
 
-      try {
+    try {
         // Check if spin was cancelled before API call
         if (spinCancelledRef.current) return null;
         
-        // Call Backend API directly (bet amounts are in Rands)
+      // Call Backend API directly (bet amounts are in Rands)
         // CRITICAL: During free spins, do NOT send actionGameSpins to backend
         // Action games should accumulate during free spins and only be consumed after free spins complete
         // If we send actionGameSpins during free spins, the backend treats it as an action game spin
         // and skips decrementing free spins
-        const response: PlayResponse = await gameApi.playGame({
+      const response: PlayResponse = await gameApi.playGame({
         sessionId: sessionId,
         betAmount: totalBet, // Total bet in Rands
         numPaylines: numPaylines,
@@ -561,29 +562,29 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
 
         // Check if spin was cancelled
         if (spinCancelledRef.current) return null;
-        
-        // Ensure minimum spin time so animation looks good
-        const minSpinTime = isTurboMode ? 200 : 600;
-        const elapsedTime = Date.now() - spinStartTime;
-        const remainingTime = Math.max(0, minSpinTime - elapsedTime);
-        
-        if (remainingTime > 0) {
-          await new Promise(resolve => setTimeout(resolve, remainingTime));
-        }
+
+      // Ensure minimum spin time so animation looks good
+      const minSpinTime = isTurboMode ? 200 : 600;
+      const elapsedTime = Date.now() - spinStartTime;
+      const remainingTime = Math.max(0, minSpinTime - elapsedTime);
+      
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
         
         // Check again after delay
         if (spinCancelledRef.current) return null;
 
-        // Animate reels stopping one by one
-        // IMPORTANT: Keep winning lines cleared during reel stopping to maintain anticipation
-        setWinningLines([]);
-        setShowFeatureGameWins(false);
-        
-        const stopBaseDelay = isTurboMode ? 5 : 40;
-        const stopIncrementDelay = isTurboMode ? 2 : 20;
-        const gridUpdateDelay = isTurboMode ? 2 : 20;
-        
-        for (let i = 0; i < numReels; i++) {
+      // Animate reels stopping one by one
+      // IMPORTANT: Keep winning lines cleared during reel stopping to maintain anticipation
+      setWinningLines([]);
+      setShowFeatureGameWins(false);
+      
+      const stopBaseDelay = isTurboMode ? 5 : 40;
+      const stopIncrementDelay = isTurboMode ? 2 : 20;
+      const gridUpdateDelay = isTurboMode ? 2 : 20;
+      
+      for (let i = 0; i < numReels; i++) {
           // Check if spin was cancelled before each reel stop
           if (spinCancelledRef.current) {
             // Reset all reels to not spinning if cancelled
@@ -591,7 +592,7 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
             return null;
           }
           
-          await new Promise(resolve => setTimeout(resolve, stopBaseDelay + i * stopIncrementDelay));
+        await new Promise(resolve => setTimeout(resolve, stopBaseDelay + i * stopIncrementDelay));
           
           // Check again after delay
           if (spinCancelledRef.current) {
@@ -635,20 +636,20 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         });
       }
 
-        // Stop spin sound when all reels have stopped
-        stopSpinSound();
+      // Stop spin sound when all reels have stopped
+      stopSpinSound();
         
         // Check if spin was cancelled
         if (spinCancelledRef.current) return null;
 
-        // Wait a moment after all reels stop to let the grid settle
-        await new Promise(resolve => setTimeout(resolve, isTurboMode ? 200 : 500));
+      // Wait a moment after all reels stop to let the grid settle
+      await new Promise(resolve => setTimeout(resolve, isTurboMode ? 200 : 500));
         
         // Check again after delay
         if (spinCancelledRef.current) return null;
 
-        // Show base game wins first (if in free spins mode)
-        if (isFreeSpinsMode) {
+      // Show base game wins first (if in free spins mode)
+      if (isFreeSpinsMode) {
         // Add scatter win to base game if applicable
         if (response.player.results.scatterWin.triggeredFreeSpins || response.player.results.scatterWin.count > 0) {
           // Only show scatter in base game if feature symbol is NOT scatter
@@ -667,6 +668,26 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         // PHASE 1: Show base game grid and wins FIRST (if any)
         // Ensure grid is stable and showing original symbols (already set during reel stop)
         // Base game wins should persist until expansion or next spin (like normal game)
+        
+        // PHASE 2: Expansion animation
+        // Queen, Stone, Leopard, Wolf: expand with 2+ reels
+        // Card symbols (10, J, K, Q, A) and all other symbols: expand with 3+ reels
+        const expansionThreshold = (response.featureSymbol === 'Queen' || response.featureSymbol === 'Stone' || response.featureSymbol === 'Leopard' || response.featureSymbol === 'Wolf') ? 2 : 3;
+        
+        // CRITICAL: Set expanding reels state EARLY if expansion will happen
+        // This ensures isAnimating stays true throughout, preventing autoplay from starting a new spin
+        if (reelsToExpandArray.length >= expansionThreshold && response.featureSymbol) {
+          // Mark all reels that will expand as expanding IMMEDIATELY
+          // This keeps isAnimating true and prevents autoplay from starting
+          setExpandingReels(prev => {
+            const newExpanding = Array(numReels).fill(false);
+            reelsToExpandArray.forEach(reelIndex => {
+              newExpanding[reelIndex] = true;
+            });
+            return newExpanding;
+          });
+        }
+        
         if (baseGameLines.length > 0) {
           setWinningLines(baseGameLines);
           setBaseGameWinningLines(baseGameLines);
@@ -676,10 +697,6 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
           await new Promise(resolve => setTimeout(resolve, isTurboMode ? 500 : 1000));
         }
         
-        // PHASE 2: Expansion animation
-        // Queen, Stone, Leopard, Wolf: expand with 2+ reels
-        // Card symbols (10, J, K, Q, A) and all other symbols: expand with 3+ reels
-        const expansionThreshold = (response.featureSymbol === 'Queen' || response.featureSymbol === 'Stone' || response.featureSymbol === 'Leopard' || response.featureSymbol === 'Wolf') ? 2 : 3;
         if (reelsToExpandArray.length >= expansionThreshold && response.featureSymbol) {
           // Keep base game wins visible during expansion - don't clear them
           // They'll stay visible alongside feature game wins after expansion
@@ -687,12 +704,18 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
           
           // Wait a moment before expansion starts to build anticipation
           // This gives time to see base game wins with borders
+          // isAnimating is already true because expandingReels was set above
           await new Promise(resolve => setTimeout(resolve, isTurboMode ? 500 : 1000));
           
           // Check if spin was cancelled before expansion
-          if (spinCancelledRef.current) return null;
+          if (spinCancelledRef.current) {
+            setExpandingReels(Array(numReels).fill(false));
+            return null;
+          }
           
           // Animate expansion for each reel that needs to expand
+          // CRITICAL: expandingReels is already set to true for all reels above (line 682-688)
+          // This ensures isAnimating stays true throughout the expansion animation
           for (const reelIndex of reelsToExpandArray) {
             // Check if spin was cancelled before each expansion
             if (spinCancelledRef.current) {
@@ -700,12 +723,7 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
               setExpandingReels(Array(numReels).fill(false));
               return null;
             }
-            // Mark this reel as expanding
-            setExpandingReels(prev => {
-              const newExpanding = [...prev];
-              newExpanding[reelIndex] = true;
-              return newExpanding;
-            });
+            // Reel is already marked as expanding (set above), no need to set again
             
             // Wait before updating grid to show expansion animation
             await new Promise(resolve => setTimeout(resolve, isTurboMode ? 100 : 300));
@@ -735,19 +753,18 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
               return null;
             }
             
-            // Reset expanding state after animation completes
-            setExpandingReels(prev => {
-              const newExpanding = [...prev];
-              newExpanding[reelIndex] = false;
-              return newExpanding;
-            });
+            // DO NOT clear expanding state here - keep it true until all animations complete
+            // This ensures isAnimating stays true and autoplay waits
           }
           
           // Wait after all expansions complete - ensure grid is fully updated and expansion animation is done
           await new Promise(resolve => setTimeout(resolve, isTurboMode ? 500 : 1000));
           
           // Check if spin was cancelled before showing feature wins
-          if (spinCancelledRef.current) return null;
+          if (spinCancelledRef.current) {
+            setExpandingReels(Array(numReels).fill(false));
+            return null;
+          }
           
           // PHASE 3: Show feature game wins ONLY AFTER expansion is complete
           // When expansion happens, ONLY show feature game wins (hide base game wins)
@@ -755,19 +772,47 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
           // This ensures borders only show on expanded reels, not on base game wins
           setShowFeatureGameWins(true);
           
+          // NOW clear expanding reels - expansion animation is complete
+          // showFeatureGameWins will keep isAnimating true until feature wins are displayed
+          setExpandingReels(Array(numReels).fill(false));
+          
           if (featureGameLines.length > 0) {
             // Store feature game winning lines separately
             setFeatureGameWinningLines(featureGameLines);
             // Clear base game wins and show ONLY feature game wins
             // Base game wins are paid but borders/animations should only show on expanded reels
             setWinningLines(featureGameLines);
-            // No delay - winning lines will stay visible until next spin starts
+            
+            // Wait additional time to show feature game wins before allowing next spin
+            // This ensures expansion animation and feature wins are fully visible
+            // CRITICAL: This delay prevents autoplay from starting the next spin too quickly
+            await new Promise(resolve => setTimeout(resolve, isTurboMode ? 1000 : 2000));
+            
+            // Check if spin was cancelled after showing feature wins
+            if (spinCancelledRef.current) return null;
+            
+            // Clear showFeatureGameWins to allow next spin, but borders will remain visible
+            // because getWinningLineIndices checks reelsToExpand and featureGameLines directly
+            setShowFeatureGameWins(false);
           } else {
             // If no feature game wins, clear all winning lines
             // This ensures no borders show after expansion if there are no feature wins
             setWinningLines([]);
             setFeatureGameWinningLines([]);
+            
+            // Still wait a bit to ensure expansion animation is visible
+            await new Promise(resolve => setTimeout(resolve, isTurboMode ? 500 : 1000));
+            
+            // Check if spin was cancelled
+            if (spinCancelledRef.current) return null;
+            
+            // If no feature game wins, we can clear the flag since there are no borders to show
+            setShowFeatureGameWins(false);
           }
+          
+          // CRITICAL: Do NOT clear showFeatureGameWins here if there are feature game wins
+          // Keep it true so borders remain visible on all expanded reels until next spin starts
+          // The flag will be cleared at the start of the next spin (line 443)
         } else {
           // If no expansion, just ensure we're using the original grid (no changes needed)
           // Grid is already set to originalGrid above
@@ -794,9 +839,9 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         
         // Track if we were in free spins mode before this spin
         const previousFreeSpins = freeSpinsRemaining;
-        
-        // Update state from response (values are already in Rands)
-        setBalance(response.player.balance);
+      
+      // Update state from response (values are already in Rands)
+      setBalance(response.player.balance);
       // Use player.freeSpinsRemaining which is the decremented value from backend
       setFreeSpinsRemaining(response.player.freeSpinsRemaining);
       setFeatureSymbol(response.player.featureSymbol);
@@ -907,22 +952,22 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
       }
 
 
-        // Return spin result for autoplay logic
-        return response.player.results;
-      } catch (error) {
+      // Return spin result for autoplay logic
+      return response.player.results;
+    } catch (error) {
         // Only show error if spin wasn't cancelled
         if (!spinCancelledRef.current) {
-          console.error("Failed to fetch spin result:", error);
-          stopSpinSound(); // Stop spin sound on error
-          toast({
-            variant: "destructive",
-            title: "Connection Error",
-            description: error instanceof Error ? error.message : "Failed to connect to game server",
-          });
+      console.error("Failed to fetch spin result:", error);
+      stopSpinSound(); // Stop spin sound on error
+      toast({
+        variant: "destructive",
+        title: "Connection Error",
+        description: error instanceof Error ? error.message : "Failed to connect to game server",
+      });
         }
-        setSpinningReels(Array(numReels).fill(false));
-        return null;
-      }
+      setSpinningReels(Array(numReels).fill(false));
+      return null;
+    }
     })();
     
     // Store the current spin promise
@@ -1026,20 +1071,28 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
     // Wait for all animations to complete before starting next spin
     // This includes: spinning, winning animations, expanding reels, bouncing reels, feature symbol selection
     // Autoplay works during free spins - removed !isFreeSpinsMode condition
+    // CRITICAL: Only start timer if NOT animating - if isAnimating becomes true, this effect will re-run
+    // and the cleanup function will cancel the timer
     if (!isAnimating && (balance >= totalBet || isFreeSpinsMode || actionGameSpins > 0)) {
       const timer = setTimeout(() => {
-        spin().then((spinResult) => {
-          if (spinResult && checkAutoplayStopConditions(spinResult)) {
-            stopAutoplay();
-            return;
-          }
-          
-          // Decrement spins remaining
-          setAutoplayState(prev => ({
-            ...prev,
-            spinsRemaining: prev.spinsRemaining - 1,
-          }));
-        });
+        // Double-check isAnimating one more time before spinning
+        // If isAnimating changed during the delay, this effect will have re-run and cancelled this timer
+        // But add an extra safety check just in case
+        if (!isAnimating) {
+          spin().then((spinResult) => {
+            if (spinResult && checkAutoplayStopConditions(spinResult)) {
+              stopAutoplay();
+              return;
+            }
+            
+            // Decrement spins remaining
+            setAutoplayState(prev => ({
+              ...prev,
+              spinsRemaining: prev.spinsRemaining - 1,
+            }));
+          });
+        }
+        // If isAnimating is true, skip this spin - the effect will re-run when animations complete
       }, isTurboMode ? 500 : 1000); // Delay between spins
       
       return () => clearTimeout(timer);
@@ -1066,11 +1119,26 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
     const isShowingFeatureGameWins = isFreeSpinsMode && showFeatureGameWins && reelsToExpand.length >= expansionThreshold;
     const gridSymbol = grid[reelIndex]?.[rowIndex];
 
+    // SPECIAL CASE: When showing feature game wins OR when expanded reels have feature game winning lines,
+    // show borders on ALL positions of expanded reels
+    // This is because after expansion, the entire reel is filled with the feature symbol
+    // Keep borders visible even after showFeatureGameWins is cleared (for next spin button)
+    if (isFreeSpinsMode && reelsToExpand.includes(reelIndex) && featureSymbol) {
+      // Find all feature game winning lines (lines for the feature symbol)
+      const featureGameLines = winningLines.filter(line => 
+        line.paylineIndex !== -1 && line.symbol === featureSymbol && line.paylineIndex < numPaylines
+      );
+      // If there are feature game winning lines, show borders on all positions of expanded reels
+      if (featureGameLines.length > 0) {
+        // Return all payline indices for feature game wins
+        // This ensures ALL positions on expanded reels show borders
+        return featureGameLines.map(line => line.paylineIndex);
+      }
+    }
+
     return winningLines.reduce((acc, line, lineIndex) => {
-      // When showing feature game wins, ONLY process lines for the feature symbol
-      // This ensures base game wins don't accidentally show borders after expansion
-      if (isFreeSpinsMode && isShowingFeatureGameWins && line.paylineIndex !== -1 && line.symbol !== featureSymbol) {
-        // Skip non-feature symbol lines when showing feature game wins
+      // When showing feature game wins, skip processing (already handled above)
+      if (isFreeSpinsMode && isShowingFeatureGameWins) {
         return acc;
       }
 
@@ -1079,37 +1147,14 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         // Regular payline wins
         // Check if this payline is active and matches the position
         if (line.paylineIndex < numPaylines && line.line[reelIndex] === rowIndex) {
-          // In free spins mode:
-          // - If showing feature game wins (after expansion): ONLY show borders on expanded reels
-          // - If NOT showing feature game wins (before expansion): show borders for base game wins
-          // In normal game mode: show borders for all wins
-          if (isFreeSpinsMode && isShowingFeatureGameWins) {
-            // Feature game wins: ONLY show borders on expanded reels with feature symbol
-            // CRITICAL: After expansion, ONLY show borders on reels that are actually expanded
-            // AND the symbol must be the feature symbol (which it will be on expanded reels)
-            // AND the winning line must be for the feature symbol
-            // Scatters on the payline should also show borders if they're within the winning count
-            if (reelsToExpand.includes(reelIndex) && line.symbol === featureSymbol) {
-              // Show border if symbol is feature symbol OR if it's a scatter within winning count
-              if (gridSymbol === featureSymbol || (gridSymbol === scatterSymbol && reelIndex < line.count)) {
-                // Additional check: ensure this position is actually part of the winning line
-                // The line.line array contains the row indices for each reel in the payline
-                // Only show border if this position matches the payline path
-                acc.push(line.paylineIndex);
-              }
-            }
-            // Do NOT show borders for base game wins when feature game wins are showing
-            // Do NOT show borders on non-expanded reels
-          } else {
-            // Base game wins (before expansion) or normal game: show borders normally
-            // Only show borders on positions that are part of the winning line AND within the winning count
-            // The condition line.line[reelIndex] === rowIndex already ensures this position is on the line
-            // CRITICAL: Only show borders on the first N reels that match, where N = line.count
-            // AND the symbol at that position must match the winning symbol OR be a scatter (scatters can substitute)
-            // For example, if count=3 and symbol=K, only show borders on reels 0, 1, 2 where symbol=K or Scatter
-            if (reelIndex < line.count && (gridSymbol === line.symbol || gridSymbol === scatterSymbol)) {
-              acc.push(line.paylineIndex);
-            }
+          // Base game wins (before expansion) or normal game: show borders normally
+          // Only show borders on positions that are part of the winning line AND within the winning count
+          // The condition line.line[reelIndex] === rowIndex already ensures this position is on the line
+          // CRITICAL: Only show borders on the first N reels that match, where N = line.count
+          // AND the symbol at that position must match the winning symbol OR be a scatter (scatters can substitute)
+          // For example, if count=3 and symbol=K, only show borders on reels 0, 1, 2 where symbol=K or Scatter
+          if (reelIndex < line.count && (gridSymbol === line.symbol || gridSymbol === scatterSymbol)) {
+            acc.push(line.paylineIndex);
           }
         }
       } else if (line.paylineIndex === -1) {

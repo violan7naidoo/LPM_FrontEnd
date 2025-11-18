@@ -189,7 +189,7 @@ export function ControlPanel({
                 </div>
             )}
             {isFreeSpinsMode && (
-                <InfoDisplay label="Free Spins" value={freeSpinsRemaining} isCurrency={false} />
+                <InfoDisplay label="Penny Spins" value={freeSpinsRemaining} isCurrency={false} />
             )}
             {actionGameSpins > 0 && !isFreeSpinsMode && (
                 <InfoDisplay label="Action Spins" value={actionGameSpins} isCurrency={false} />
@@ -241,7 +241,7 @@ export function ControlPanel({
                 )}
                 {isFreeSpinsMode && (
                     <div className="flex-1">
-                        <MobileInfoDisplay label="Free Spins" value={freeSpinsRemaining} isCurrency={false} />
+                        <MobileInfoDisplay label="Penny Spins" value={freeSpinsRemaining} isCurrency={false} />
                     </div>
                 )}
                 {actionGameSpins > 0 && !isFreeSpinsMode && (

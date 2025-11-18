@@ -171,7 +171,7 @@ export function PayTableDialog({ betPerPayline = 0.20, totalBet }: PayTableDialo
                   <h4 className="font-bold text-white text-lg mb-3">Scatter (Wild & Scatter)</h4>
                   <div className="mb-3">
                     <div className="text-sm text-accent font-bold mb-2">
-                      3+ Scatters = {config?.freeSpinsAwarded || 10} Free Spins
+                      3+ Scatters = {config?.freeSpinsAwarded || 10} Penny Spins
                     </div>
                     {/* Scatter Payouts */}
                     {config?.scatterPayout && (
@@ -214,7 +214,7 @@ export function PayTableDialog({ betPerPayline = 0.20, totalBet }: PayTableDialo
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    The Scatter symbol acts as both a wild and scatter. It substitutes for other symbols to create wins, and landing 3 or more anywhere on the reels awards {config?.freeSpinsAwarded || 10} free spins with a randomly selected expanding symbol.
+                    The Scatter symbol acts as both a wild and scatter. It substitutes for other symbols to create wins, and landing 3 or more anywhere on the reels awards {config?.freeSpinsAwarded || 10} penny spins with a randomly selected expanding symbol.
                   </p>
                 </div>
               </div>

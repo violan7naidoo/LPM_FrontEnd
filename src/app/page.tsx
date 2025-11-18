@@ -261,7 +261,7 @@ export default function Home() {
       <BottomSection 
         betAmount={betAmount} 
         setBetAmount={setBetAmount} 
-        betPerPayline={betPerPayline}
+        betPerPayline={betPerPayline} 
         onFreeSpinsStateChange={handleFreeSpinsStateChange}
         onActionWheelStateChange={handleActionWheelStateChange}
         onSessionIdChange={setSessionId}

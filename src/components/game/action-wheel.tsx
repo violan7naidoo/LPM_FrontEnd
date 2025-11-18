@@ -11,6 +11,7 @@
 import { useState, useEffect, useCallback, useImperativeHandle, forwardRef, useMemo } from 'react';
 import useSound from 'use-sound';
 import { SOUNDS } from '@/lib/sounds';
+import Image from 'next/image';
 
 interface ActionWheelProps {
   isOpen: boolean;
@@ -27,10 +28,10 @@ export interface ActionWheelHandle {
 }
 
 // 12 segments arranged like a clock, starting from 12 o'clock going clockwise
-// 12 o'clock: 6 free spins
+// 12 o'clock: 6 penny spins
 // Then clockwise: R10, nothing, R10, R10, R10, nothing, R10, R10, R10, nothing, R10
 const WHEEL_SEGMENTS = [
-  '6',    // 0: 12 o'clock - 6 free spins
+  '6',    // 0: 12 o'clock - 6 penny spins
   'R10',  // 1: 1 o'clock
   '',     // 2: 2 o'clock - nothing
   'R10',  // 3: 3 o'clock
@@ -209,83 +210,64 @@ export const ActionWheel = forwardRef<ActionWheelHandle, ActionWheelProps>(({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <div className="relative w-full max-w-xl mx-auto">
+      <div className="relative w-full max-w-[750px] mx-auto">
         {/* Wheel Container */}
         <div className="relative w-full aspect-square">
-          {/* Outer Wheel Circle with SVG for proper circular segments */}
-          <div className="relative w-full h-full">
+          {/* Background Image - covers the entire wheel */}
+          <div className="absolute inset-0 w-full h-full z-0">
+            <Image
+              src="/Action-Wheel/ag.png"
+              alt="Action Wheel Background"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+          {/* Outer Wheel Circle with SVG - segments hidden, only center hub and pointer visible */}
+          <div className="relative w-full h-full z-10">
             <svg className="w-full h-full transform -rotate-[105deg]" viewBox="0 0 350 350">
-              <circle cx="175" cy="175" r="165" fill="none" stroke="#facc15" strokeWidth="6" />
-              {/* Segments */}
+              {/* Segments - only show color overlay when active or selected, no borders */}
               {WHEEL_SEGMENTS.map((segment, index) => {
                 const startAngle = (index * 30) * (Math.PI / 180);
                 const endAngle = ((index + 1) * 30) * (Math.PI / 180);
-                const radius = 165;
+                const outerRadius = 140; // Reduced from 165 to fit within segment boundaries
+                const innerRadius = 40; // Inner radius to avoid center hub area
                 const centerX = 175;
                 const centerY = 175;
                 
-                const x1 = centerX + radius * Math.cos(startAngle);
-                const y1 = centerY + radius * Math.sin(startAngle);
-                const x2 = centerX + radius * Math.cos(endAngle);
-                const y2 = centerY + radius * Math.sin(endAngle);
+                // Outer arc points
+                const x1 = centerX + outerRadius * Math.cos(startAngle);
+                const y1 = centerY + outerRadius * Math.sin(startAngle);
+                const x2 = centerX + outerRadius * Math.cos(endAngle);
+                const y2 = centerY + outerRadius * Math.sin(endAngle);
+                
+                // Inner arc points
+                const x3 = centerX + innerRadius * Math.cos(endAngle);
+                const y3 = centerY + innerRadius * Math.sin(endAngle);
+                const x4 = centerX + innerRadius * Math.cos(startAngle);
+                const y4 = centerY + innerRadius * Math.sin(startAngle);
                 
                 const isActive = currentSegment === index;
                 const isSelected = selectedSegment === index;
                 const fillColor = isSelected ? '#22c55e' : isActive ? '#eab308' : segment === 'R10' ? '#1f2937' : segment === '6' ? '#1f2937' : '#374151';
                 
-                const textX = centerX + (radius * 0.7) * Math.cos(startAngle + (endAngle - startAngle) / 2);
-                const textY = centerY + (radius * 0.7) * Math.sin(startAngle + (endAngle - startAngle) / 2);
+                const textX = centerX + (outerRadius * 0.7) * Math.cos(startAngle + (endAngle - startAngle) / 2);
+                const textY = centerY + (outerRadius * 0.7) * Math.sin(startAngle + (endAngle - startAngle) / 2);
                 const textAngle = (startAngle + (endAngle - startAngle) / 2) * (180 / Math.PI) + 90;
                 
                 return (
                   <g key={index}>
-                    <path
-                      d={`M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`}
-                      fill={fillColor}
-                      stroke="#facc15"
-                      strokeWidth="2"
-                      opacity={isActive ? 0.8 : isSelected ? 0.9 : 0.7}
-                    />
-                    {/* Segment Text */}
-                    {segment === '6' ? (
-                      <g transform={`rotate(${textAngle} ${textX} ${textY})`}>
-                        <text
-                          x={textX}
-                          y={textY - 6}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          fill="white"
-                          fontSize="20"
-                          fontWeight="bold"
-                        >
-                          6
-                        </text>
-                        <text
-                          x={textX}
-                          y={textY + 10}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          fill="white"
-                          fontSize="14"
-                          fontWeight="bold"
-                        >
-                          Spins
-                        </text>
-                      </g>
-                    ) : segment === 'R10' ? (
-                      <text
-                        x={textX}
-                        y={textY}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fill="white"
-                        fontSize="20"
-                        fontWeight="bold"
-                        transform={`rotate(${textAngle} ${textX} ${textY})`}
-                      >
-                        R10
-                      </text>
+                    {/* Segments - only show overlay when active (yellow) or selected (green), no borders */}
+                    {isSelected || isActive ? (
+                      <path
+                        d={`M ${x1} ${y1} A ${outerRadius} ${outerRadius} 0 0 1 ${x2} ${y2} L ${x3} ${y3} A ${innerRadius} ${innerRadius} 0 0 0 ${x4} ${y4} Z`}
+                        fill={fillColor}
+                        stroke="none"
+                        opacity={isSelected ? 0.6 : 0.4}
+                        style={{ mixBlendMode: 'overlay' }}
+                      />
                     ) : null}
+                    {/* Text removed - background image already has all text and numbers */}
                   </g>
                 );
               })}
@@ -296,7 +278,7 @@ export const ActionWheel = forwardRef<ActionWheelHandle, ActionWheelProps>(({
               <div className="w-28 h-28 rounded-full bg-yellow-400 border-2 border-yellow-600 flex flex-col items-center justify-center shadow-2xl">
                 <div className="text-[10px] font-bold text-red-600">AG</div>
                 <div className="text-2xl font-bold text-red-600">{totalActionSpins}</div>
-                <div className="text-[10px] font-bold text-red-600">RUN</div>
+                <div className="text-[10px] font-bold text-red-600">SPINS</div>
                 {/* Only show accumulated win when all spins are complete */}
                 {accumulatedWin > 0 && totalActionSpins === 0 && (
                   <div className="text-[10px] font-bold text-green-600 mt-0.5">
@@ -307,7 +289,7 @@ export const ActionWheel = forwardRef<ActionWheelHandle, ActionWheelProps>(({
             </div>
 
             {/* Pointer/Selector at top */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
+            <div className="absolute top-[70px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none">
               <div className="w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[25px] border-t-red-600"></div>
             </div>
           </div>
