@@ -1189,6 +1189,15 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
               ? 'border-yellow-400'
               : 'border-primary/50'
           }`}>
+            {/* Frame overlay - positioned to match the grid border area */}
+            <div className="absolute inset-0 pointer-events-none z-[5]" style={{ transform: 'scale(1)' }}>
+              <img
+                src="/frame/frame1.png"
+                alt="Grid Frame"
+                className="w-full h-full object-cover"
+                style={{ borderRadius: '16px' }}
+              />
+            </div>
             <div className="relative w-full h-full flex justify-center items-center">
               <PaylineNumbers 
                 winningLines={winningLines} 
@@ -1200,7 +1209,8 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
                   style={{ 
                     gridTemplateColumns: `repeat(${numReels}, minmax(0, 1fr))`,
                     maxWidth: '1296px',
-                    margin: '0 auto'
+                    margin: '0 auto',
+                    marginTop: '50px' 
                   }}
                 >
                   {config && numReels > 0 && Array.from({ length: numReels }).map((_, i) => (
