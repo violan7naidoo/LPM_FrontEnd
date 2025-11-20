@@ -214,7 +214,7 @@ export function MiddleSection({
           className="absolute object-auto"
           style={{ 
             display: imagesLoaded ? 'block' : 'none',
-            top: '90px',
+            top: '100px',
             left: 0,
             right: 0,
             width: '100%',

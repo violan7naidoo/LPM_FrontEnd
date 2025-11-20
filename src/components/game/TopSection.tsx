@@ -521,7 +521,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
         <div className="w-full" style={{ marginLeft: '25px' }}>
           <PayCell symbolId={queenSymbol} betKey={betKey} config={config} alignRight={false} borderImage="/frame/left-block.png" />
         </div>
-        <div className="w-full flex justify-end" style={{ paddingLeft: '300px', marginRight: '25px' }}>
+        <div className="w-full flex justify-end" style={{ marginRight: '25px' }}>
           <PayCell symbolId={stoneSymbol} betKey={betKey} config={config} alignRight={true} borderImage="/frame/right-block.png" />
         </div>
 
@@ -533,7 +533,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
         <div className="w-full" style={{ marginLeft: '25px' }}>
           <PayCell symbolId={wolfSymbol} betKey={betKey} config={config} alignRight={false} borderImage="/frame/left-block.png" />
         </div>
-        <div className="w-full flex justify-end" style={{ paddingLeft: '300px', marginRight: '25px' }}>
+        <div className="w-full flex justify-end" style={{ marginRight: '25px' }}>
           <PayCell symbolId={leopardSymbol} betKey={betKey} config={config} alignRight={true} borderImage="/frame/right-block.png" />
         </div>
 
@@ -552,7 +552,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
             borderImage="/frame/left-block.png"
           />
         </div>
-        <div className="w-full flex justify-end" style={{ paddingLeft: '300px', marginRight: '25px' }}>
+        <div className="w-full flex justify-end" style={{ marginRight: '25px' }}>
           <LowPayCell
             symbolIds={['Q', 'J', '10']}
             betKey={betKey}
@@ -566,9 +566,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           Middle block - "10 PENNY GAMES" / Feature Symbol / Action Games
           - Positioned absolutely within the grid to sit between left and right blocks
           - Does not affect grid flow
+          - Has 10px margins on both left and right sides
         */}
-        <div className="col-span-2 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none" style={{ marginTop: '100px', marginLeft: '35px' }}>
-          <div className="flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 w-[500px] h-[550px] relative pointer-events-auto" style={{ border: 'none' }}>
+        <div className="col-span-2 absolute top-1/2 transform -translate-y-1/2 flex items-center justify-center pointer-events-none" style={{ marginTop: '100px', left: '10px', right: '10px', width: 'calc(100% - 20px)' }}>
+          <div className="flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 w-[500px] h-[550px] relative pointer-events-auto mx-auto" style={{ border: 'none' }}>
             {/* Border image overlay */}
             <div
               className="absolute inset-0 pointer-events-none"
