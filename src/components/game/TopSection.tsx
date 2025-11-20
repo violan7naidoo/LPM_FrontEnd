@@ -128,12 +128,13 @@ function PayCell({
       }`}
       style={{
         border: borderImage ? 'none' : '4px solid rgba(234, 179, 8, 0.5)',
+        ...(alignRight ? { marginRight: '25px' } : {})
       }}
     >
       {/* Border image overlay */}
       {borderImage && (
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none rounded-lg"
           style={{
             backgroundImage: `url(${borderImage})`,
             backgroundSize: '100% 100%',
@@ -226,19 +227,20 @@ function LowPayCell({
 
   return (
     <div 
-      className={`bg-black/40 p-6 w-[720px] relative ${
+      className={`bg-black/40 p-6 w-[720px] relative rounded-lg ${
         alignRight 
-          ? 'rounded-r-lg rounded-l-none flex justify-end' 
-          : 'rounded-l-lg rounded-r-none'
+          ? 'flex justify-end' 
+          : ''
       }`}
       style={{
         border: borderImage ? 'none' : '4px solid rgba(234, 179, 8, 0.5)',
+        ...(alignRight ? { marginRight: '25px' } : {})
       }}
     >
       {/* Border image overlay */}
       {borderImage && (
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none rounded-lg"
           style={{
             backgroundImage: `url(${borderImage})`,
             backgroundSize: '100% 100%',
@@ -383,15 +385,17 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - This creates a single wide block at the top
         */}
         <div 
-          className="col-span-2 bg-black/40 rounded-none p-6 w-full relative"
+          className="col-span-2 bg-black/40 rounded-lg p-6 relative"
           style={{
             border: 'none',
-            position: 'relative'
+            position: 'relative',
+            marginLeft: '25px',
+            marginRight: '35px'
           }}
         >
           {/* Border image overlay */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none rounded-lg"
             style={{
               backgroundImage: 'url(/frame/scatter-block.png)',
               backgroundSize: '100% 100%',
@@ -457,7 +461,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
               - Shows which symbols can act as wilds/substitutes
             */}
             <div className="flex flex-col gap-4 items-center">
-              <p className="text-white font-bold text-2xl">SUBSTITUTES FOR</p>
+              <p className="text-blue-400 font-bold text-4xl" style={{ fontFamily: 'Cinzel, serif' }}>SUBSTITUTES FOR</p>
               <div className="flex gap-2">
                 {substituteSymbols.slice(0, 4).map((symbolId) => {
                   const symbol = config.symbols[symbolId];
@@ -499,10 +503,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - Left block: Starts at left edge
           - Right block: Aligned to right edge with space in middle
         */}
-        <div className="w-full">
+        <div className="w-full" style={{ marginLeft: '25px' }}>
           <PayCell symbolId={queenSymbol} betKey={betKey} config={config} alignRight={false} borderImage="/frame/left-block.png" />
         </div>
-        <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
+        <div className="w-full flex justify-end" style={{ paddingLeft: '300px', marginRight: '25px' }}>
           <PayCell symbolId={stoneSymbol} betKey={betKey} config={config} alignRight={true} borderImage="/frame/right-block.png" />
         </div>
 
@@ -511,10 +515,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - Left block: Starts at left edge
           - Right block: Aligned to right edge with space in middle
         */}
-        <div className="w-full">
+        <div className="w-full" style={{ marginLeft: '25px' }}>
           <PayCell symbolId={wolfSymbol} betKey={betKey} config={config} alignRight={false} borderImage="/frame/left-block.png" />
         </div>
-        <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
+        <div className="w-full flex justify-end" style={{ paddingLeft: '300px', marginRight: '25px' }}>
           <PayCell symbolId={leopardSymbol} betKey={betKey} config={config} alignRight={true} borderImage="/frame/right-block.png" />
         </div>
 
@@ -524,7 +528,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - Right: Q, J, and 10 symbols grouped together (aligned to right edge with space in middle)
           - LowPayCell handles multiple symbols with shared payouts
         */}
-        <div className="w-full">
+        <div className="w-full" style={{ marginLeft: '25px' }}>
           <LowPayCell
             symbolIds={['A', 'K']}
             betKey={betKey}
@@ -533,7 +537,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
             borderImage="/frame/left-block.png"
           />
         </div>
-        <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
+        <div className="w-full flex justify-end" style={{ paddingLeft: '300px', marginRight: '25px' }}>
           <LowPayCell
             symbolIds={['Q', 'J', '10']}
             betKey={betKey}

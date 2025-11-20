@@ -28,6 +28,7 @@ import Image from 'next/image';
 import { TopSection } from "@/components/game/TopSection";
 import { MiddleSection } from "@/components/game/MiddleSection";
 import { BottomSection } from "@/components/game/BottomSection";
+import { BackgroundAnimation } from "@/components/game/BackgroundAnimation";
 import { useBetAmounts } from '@/lib/slot-config';
 import { gameApi } from '@/lib/game-api';
 
@@ -228,15 +229,23 @@ export default function Home() {
   const betPerPayline = betAmount / numPaylines;
 
   return (
-    <div className="game-container">
+    <div className="game-container relative">
+      {/* Background Animation */}
+      <BackgroundAnimation isFreeSpinsMode={isFreeSpinsMode} />
+      
       {/* Game Title at the top */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-center pt-2 z-20" style={{ height: '120px', transform: 'translateY(50px)' }}>
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-center z-20" style={{ height: '200px', transform: 'translateY(100px)' }}>
         <Image
           src="/title/title.png"
           alt="Snow Kingdom"
           width={1496}
           height={150}
-          className="object-contain w-full h-full"
+          className="object-contain"
+          style={{ 
+            width: '120%',
+            height: 'auto',
+            transform: 'scale(0.29)'
+          }}
           unoptimized
           priority
         />

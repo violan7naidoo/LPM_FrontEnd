@@ -248,7 +248,7 @@ export function ControlPanel({
                 className="flex items-center justify-center gap-0 p-0 rounded-md text-center h-full info-display-bg flex-[1] min-w-[120px] relative"
                 style={{
                     backgroundImage: 'url(/frame/frame-icon.png)',
-                    backgroundSize: 'cover',
+                    backgroundSize: '100% 100%',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                 }}

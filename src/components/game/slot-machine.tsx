@@ -413,7 +413,11 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
   }, [toast, config]);
 
   const spin = useCallback(async () => {
-    if (isAnimating || !sessionId) return;
+    // In free spins mode, wait for all animations. In standard games, allow interrupting animations
+    if (isFreeSpinsMode && isAnimating) return;
+    // In standard games, only block if reels are actually spinning (not during win animations, expanding, etc.)
+    if (!isFreeSpinsMode && isSpinning) return;
+    if (!sessionId) return;
 
     // Check balance on frontend for quick response
     // Allow spinning during free spins even if balance is low
@@ -426,26 +430,28 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
       return;
     }
 
-    // Cancel any ongoing spin immediately
+    // Cancel any ongoing spin promise immediately
     spinCancelledRef.current = true;
+    
+    // IMMEDIATELY clear all animation states BEFORE any delays
+    // In standard games, this allows interrupting win animations, expanding reels, etc.
+    // Clear these synchronously so the button becomes enabled immediately
+    setLastWin(0);
+    setWinningLines([]);
+    setBaseGameWinningLines([]);
+    setFeatureGameWinningLines([]);
+    setShowFeatureGameWins(false);
+    setReelsToExpand([]);
+    setWinningFeedback(null);
+    setExpandingReels(Array(numReels).fill(false));
+    setBouncingReels(Array(numReels).fill(false));
+    setSpinningReels(Array(numReels).fill(false));
     
     // Wait a tiny bit to ensure previous spin's state updates are processed
     await new Promise(resolve => setTimeout(resolve, 0));
     
     // Reset cancellation flag for this new spin
     spinCancelledRef.current = false;
-
-    // IMMEDIATELY clear all animation states to prevent conflicts
-    setLastWin(0);
-    setWinningLines([]);
-    setBaseGameWinningLines([]);
-    setFeatureGameWinningLines([]);
-    setShowFeatureGameWins(false); // Reset feature game wins - expanded symbol won't show until expansion completes
-    setReelsToExpand([]); // Clear expanded reels at start of new spin
-    setWinningFeedback(null); // Clear any existing win animation
-    setExpandingReels(Array(numReels).fill(false)); // Clear all expanding states
-    setBouncingReels(Array(numReels).fill(false)); // Clear all bouncing states
-    setSpinningReels(Array(numReels).fill(false)); // Clear all spinning states first
 
     // Play spin sound
     stopSpinSound();
@@ -1248,7 +1254,7 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         totalBet={totalBet}
         balance={balance}
         lastWin={lastWin}
-        isSpinning={isAnimating}
+        isSpinning={isFreeSpinsMode ? isAnimating : isSpinning}
         onSpin={showActionWheel ? (() => {}) : spin}
         onIncreaseBet={handleIncreaseBet}
         onDecreaseBet={handleDecreaseBet}
