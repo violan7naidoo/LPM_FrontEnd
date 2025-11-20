@@ -24,6 +24,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { TopSection } from "@/components/game/TopSection";
 import { MiddleSection } from "@/components/game/MiddleSection";
 import { BottomSection } from "@/components/game/BottomSection";
@@ -229,10 +230,16 @@ export default function Home() {
   return (
     <div className="game-container">
       {/* Game Title at the top */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-center pt-2 z-20">
-        <h1 className="slot-game-title text-6xl sm:text-7xl md:text-8xl font-bold uppercase tracking-wider text-center">
-          Snow Kingdom
-        </h1>
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-center pt-2 z-20" style={{ height: '120px', transform: 'translateY(50px)' }}>
+        <Image
+          src="/title/title.png"
+          alt="Snow Kingdom"
+          width={1496}
+          height={150}
+          className="object-contain w-full h-full"
+          unoptimized
+          priority
+        />
       </div>
       
       <TopSection 

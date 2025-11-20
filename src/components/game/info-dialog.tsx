@@ -26,6 +26,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Info } from 'lucide-react';
 import { useGameConfig } from '@/hooks/use-game-config';
 import { usePaylines } from '@/lib/slot-config';
@@ -33,17 +35,31 @@ import { SymbolDisplay } from './symbol-display';
 
 interface InfoDialogProps {
   totalBet?: number;
+  isMusicEnabled?: boolean;
+  onToggleMusic?: () => void;
+  isSfxEnabled?: boolean;
+  onToggleSfx?: () => void;
+  volume?: number;
+  onVolumeChange?: (volume: number) => void;
 }
 
-export function InfoDialog({ totalBet }: InfoDialogProps = {} as InfoDialogProps) {
+export function InfoDialog({ 
+  totalBet,
+  isMusicEnabled = true,
+  onToggleMusic,
+  isSfxEnabled = true,
+  onToggleSfx,
+  volume = 50,
+  onVolumeChange
+}: InfoDialogProps = {} as InfoDialogProps) {
   const { config } = useGameConfig();
   const paylines = usePaylines();
   
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="rounded-full w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 p-1 bg-black/30 hover:bg-black/50 transition-colors">
-          <Info className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 text-white" />
+        <Button variant="secondary" className="rounded-full !p-0 bg-black/30 hover:bg-black/50 transition-colors" style={{ padding: 0, width: '90px', height: '90px', minWidth: '90px', minHeight: '90px' }}>
+          <Info style={{ width: '70px', height: '70px', minWidth: '70px', minHeight: '70px' }} className="text-white" />
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] max-w-4xl h-[90vh] max-h-[90vh] bg-background/95 backdrop-blur-sm p-0 flex flex-col overflow-hidden">
@@ -217,6 +233,70 @@ export function InfoDialog({ totalBet }: InfoDialogProps = {} as InfoDialogProps
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Audio Settings Section */}
+          <div className="border-t border-muted-foreground/10 pt-6 mb-6">
+            <h3 className="font-headline text-lg sm:text-2xl text-accent mb-3 sm:mb-4">Audio Settings</h3>
+            
+            <div className="space-y-6">
+              {/* Volume Control */}
+              <div className="space-y-3">
+                <h4 className="font-headline text-white text-lg">Volume</h4>
+                <div className="space-y-2">
+                  <Slider
+                    value={[volume ?? 50]}
+                    onValueChange={(value) => onVolumeChange?.(value[0])}
+                    max={100}
+                    min={0}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>0</span>
+                    <span className="font-bold text-accent">{volume ?? 50}</span>
+                    <span>100</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Music Toggle */}
+              <div className="flex items-center justify-between p-4 bg-card/30 border border-muted-foreground/20 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="music-enabled"
+                    checked={isMusicEnabled ?? true}
+                    onCheckedChange={onToggleMusic}
+                    className="w-5 h-5"
+                  />
+                  <label htmlFor="music-enabled" className="text-white font-medium">
+                    Music Enabled
+                  </label>
+                </div>
+              </div>
+
+              {/* SFX Toggle */}
+              <div className="flex items-center justify-between p-4 bg-card/30 border border-muted-foreground/20 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="sfx-enabled"
+                    checked={isSfxEnabled ?? true}
+                    onCheckedChange={onToggleSfx}
+                    className="w-5 h-5"
+                  />
+                  <label htmlFor="sfx-enabled" className="text-white font-medium">
+                    SFX Enabled
+                  </label>
+                </div>
+              </div>
+
+              {/* SFX Explanation */}
+              <div className="p-3 bg-card/20 border border-muted-foreground/10 rounded-lg">
+                <p className="text-xs text-muted-foreground">
+                  SFX includes reel spinning, win sounds, scatter effects, button clicks, and all game sound effects.
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -61,12 +61,14 @@ function PayCell({
   config,
   hidePayouts = [],
   alignRight = false,
+  borderImage,
 }: {
   symbolId: string;
   betKey: string;
   config: FrontendGameConfig;
   hidePayouts?: number[];
   alignRight?: boolean;
+  borderImage?: string;
 }) {
   // Retrieve the symbol configuration from the game config
   // Returns null if symbol doesn't exist (prevents rendering errors)
@@ -114,17 +116,35 @@ function PayCell({
 
   // Render the paytable cell with symbol image and payout information
   return (
-    // Background block: semi-transparent black with yellow border
+    // Background block: semi-transparent black with yellow border (or custom border image)
     // p-6 = 24px padding, border-4 = 4px border
     // w-[720px]: Fixed width for rows 2, 3, 4 (420px + 200px + 100px)
     // Conditional rounded corners: left blocks round left, right blocks round right, no outer border
-    <div className={`bg-black/40 p-6 border-4 border-yellow-400/50 w-[720px] ${
-      alignRight 
-        ? 'rounded-r-lg rounded-l-none flex justify-end' 
-        : 'rounded-l-lg rounded-r-none'
-    }`}>
+    <div 
+      className={`bg-black/40 p-6 w-[720px] relative ${
+        alignRight 
+          ? 'rounded-r-lg rounded-l-none flex justify-end' 
+          : 'rounded-l-lg rounded-r-none'
+      }`}
+      style={{
+        border: borderImage ? 'none' : '4px solid rgba(234, 179, 8, 0.5)',
+      }}
+    >
+      {/* Border image overlay */}
+      {borderImage && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `url(${borderImage})`,
+            backgroundSize: '100% 100%',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            zIndex: 0
+          }}
+        />
+      )}
       {/* Flex container: symbol image on left, payouts on right (or reversed for right-aligned) */}
-      <div className={`flex items-center ${alignRight ? 'flex-row-reverse gap-2' : 'gap-8'}`}>
+      <div className={`flex items-center relative z-10 ${alignRight ? 'flex-row-reverse gap-2' : 'gap-8'}`}>
         <Image
           src={symbol.image}
           alt={symbol.name}
@@ -166,12 +186,14 @@ function LowPayCell({
   config,
   hidePayouts = [],
   alignRight = false,
+  borderImage,
 }: {
   symbolIds: string[];
   betKey: string;
   config: FrontendGameConfig;
   hidePayouts?: number[];
   alignRight?: boolean;
+  borderImage?: string;
 }) {
   // Map symbol IDs to their configuration objects and filter out any null/undefined values
   const symbols = symbolIds.map((id) => config?.symbols?.[id]).filter(Boolean) as FrontendSymbolConfig[];
@@ -203,12 +225,30 @@ function LowPayCell({
   };
 
   return (
-    <div className={`bg-black/40 p-6 border-4 border-yellow-400/50 w-[720px] ${
-      alignRight 
-        ? 'rounded-r-lg rounded-l-none flex justify-end' 
-        : 'rounded-l-lg rounded-r-none'
-    }`}>
-      <div className={`flex items-center ${alignRight ? 'flex-row-reverse gap-1' : 'gap-4'}`}>
+    <div 
+      className={`bg-black/40 p-6 w-[720px] relative ${
+        alignRight 
+          ? 'rounded-r-lg rounded-l-none flex justify-end' 
+          : 'rounded-l-lg rounded-r-none'
+      }`}
+      style={{
+        border: borderImage ? 'none' : '4px solid rgba(234, 179, 8, 0.5)',
+      }}
+    >
+      {/* Border image overlay */}
+      {borderImage && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `url(${borderImage})`,
+            backgroundSize: '100% 100%',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            zIndex: 0
+          }}
+        />
+      )}
+      <div className={`flex items-center relative z-10 ${alignRight ? 'flex-row-reverse gap-1' : 'gap-4'}`}>
         <div className="flex flex-shrink-0">
           {symbols.map((symbol, index) => (
             <Image
@@ -320,6 +360,8 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
       style={{
         width: '100%',
         minWidth: '100%',
+        transform: 'translateY(60px)',
+        zIndex: 10,
       }}
     >
       {/* 
@@ -340,9 +382,26 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - col-span-2: Spans both columns of the grid
           - This creates a single wide block at the top
         */}
-        <div className="col-span-2 bg-black/40 rounded-none p-6 border-4 border-yellow-400/50 w-full">
-          {/* Flex container: Scatter on left, SUBSTITUTES FOR on right */}
-          <div className="flex items-center justify-between gap-8">
+        <div 
+          className="col-span-2 bg-black/40 rounded-none p-6 w-full relative"
+          style={{
+            border: 'none',
+            position: 'relative'
+          }}
+        >
+          {/* Border image overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: 'url(/frame/scatter-block.png)',
+              backgroundSize: '100% 100%',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              zIndex: 0
+            }}
+          />
+          {/* Content wrapper with z-index to appear above border */}
+          <div className="relative z-10 flex items-center justify-between gap-8">
             {/* Scatter section on left side of the block */}
             <div className="flex items-center gap-8">
               {/* 
@@ -441,10 +500,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - Right block: Aligned to right edge with space in middle
         */}
         <div className="w-full">
-          <PayCell symbolId={queenSymbol} betKey={betKey} config={config} alignRight={false} />
+          <PayCell symbolId={queenSymbol} betKey={betKey} config={config} alignRight={false} borderImage="/frame/left-block.png" />
         </div>
         <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
-          <PayCell symbolId={stoneSymbol} betKey={betKey} config={config} alignRight={true} />
+          <PayCell symbolId={stoneSymbol} betKey={betKey} config={config} alignRight={true} borderImage="/frame/right-block.png" />
         </div>
 
         {/* 
@@ -453,10 +512,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - Right block: Aligned to right edge with space in middle
         */}
         <div className="w-full">
-          <PayCell symbolId={wolfSymbol} betKey={betKey} config={config} alignRight={false} />
+          <PayCell symbolId={wolfSymbol} betKey={betKey} config={config} alignRight={false} borderImage="/frame/left-block.png" />
         </div>
         <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
-          <PayCell symbolId={leopardSymbol} betKey={betKey} config={config} alignRight={true} />
+          <PayCell symbolId={leopardSymbol} betKey={betKey} config={config} alignRight={true} borderImage="/frame/right-block.png" />
         </div>
 
         {/* 
@@ -471,6 +530,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
             betKey={betKey}
             config={config}
             alignRight={false}
+            borderImage="/frame/left-block.png"
           />
         </div>
         <div className="w-full flex justify-end" style={{ paddingLeft: '300px' }}>
@@ -479,63 +539,71 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
             betKey={betKey}
             config={config}
             alignRight={true}
+            borderImage="/frame/right-block.png"
           />
         </div>
 
         {/* 
-          Center Feature: Shows either "10 PENNY GAMES", the Feature Symbol, or Action Game Win Message
-          - absolute: Positioned absolutely within the relative grid container
-          - left-1/2 top-1/2: Centers horizontally and vertically
-          - transform -translate-x-1/2 -translate-y-1/2: Adjusts for element's own width/height
-          - h-[40%]: Takes 40% of parent container height
-          - min-h-[350px]: Minimum height of 350px to ensure visibility
-          - This overlay appears on top of the grid, showing the special feature information
+          Middle block - "10 PENNY GAMES" / Feature Symbol / Action Games
+          - Positioned absolutely within the grid to sit between left and right blocks
+          - Does not affect grid flow
         */}
-        {actionGamesFinished ? (
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
-            <p className="text-yellow-400 font-bold text-3xl">ACTION GAMES FINISHED</p>
-          </div>
-        ) : showActionWheel && actionGameWinMessage ? (
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
-            <p className="text-yellow-400 font-bold text-2xl sm:text-3xl md:text-4xl mb-4 text-center">
-              {actionGameWinMessage}
-            </p>
-            {actionGameWinAmount && actionGameWinAmount > 0 && (
-              <p className="text-yellow-400 font-bold text-3xl sm:text-4xl md:text-5xl">
-                R {actionGameWinAmount.toFixed(2)}
-              </p>
-            )}
-          </div>
-        ) : isFreeSpinsMode && featureSymbol ? (
-          // Show expanding symbol during free spins (not just after expansion)
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
-            <p className="text-yellow-400 font-bold text-2xl mb-4">EXPANDING SYMBOL</p>
-            {config?.symbols?.[featureSymbol]?.image ? (
-              <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 flex items-center justify-center">
-                <Image
-                  src={config.symbols[featureSymbol].image}
-                  alt={featureSymbol}
-                  width={320}
-                  height={320}
-                  className="object-contain"
-                  unoptimized
-                />
-              </div>
+        <div className="col-span-2 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none" style={{ marginTop: '100px', marginLeft: '15px' }}>
+          <div className="flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 w-[500px] h-[550px] relative pointer-events-auto" style={{ border: 'none' }}>
+            {/* Border image overlay */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: 'url(/frame/middle-block.png)',
+                backgroundSize: '100% 100%',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                zIndex: 0
+              }}
+            />
+            {actionGamesFinished ? (
+              <p className="text-yellow-400 font-bold text-3xl relative z-10">ACTION GAMES FINISHED</p>
+            ) : showActionWheel && actionGameWinMessage ? (
+              <>
+                <p className="text-yellow-400 font-bold text-2xl sm:text-3xl md:text-4xl mb-4 text-center relative z-10">
+                  {actionGameWinMessage}
+                </p>
+                {actionGameWinAmount && actionGameWinAmount > 0 && (
+                  <p className="text-yellow-400 font-bold text-3xl sm:text-4xl md:text-5xl relative z-10">
+                    R {actionGameWinAmount.toFixed(2)}
+                  </p>
+                )}
+              </>
+            ) : isFreeSpinsMode && featureSymbol ? (
+              // Show expanding symbol during free spins (not just after expansion)
+              <>
+                <p className="text-yellow-400 font-bold text-2xl mb-4 relative z-10">EXPANDING SYMBOL</p>
+                {config?.symbols?.[featureSymbol]?.image ? (
+                  <div className="relative w-80 h-80 flex items-center justify-center z-10">
+                    <Image
+                      src={config.symbols[featureSymbol].image}
+                      alt={featureSymbol}
+                      width={320}
+                      height={320}
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <p className="text-yellow-400 font-bold text-4xl mt-4 relative z-10">{featureSymbol}</p>
+                )}
+              </>
+            ) : showActionWheel ? (
+              <p className="text-yellow-400 font-bold text-3xl relative z-10">ACTION GAMES</p>
             ) : (
-              <p className="text-yellow-400 font-bold text-4xl mt-4">{featureSymbol}</p>
+              <>
+                <p className="text-yellow-400 font-bold text-3xl relative z-10">10 PENNY GAMES</p>
+                <p className="text-yellow-400 font-bold text-3xl relative z-10">+</p>
+                <p className="text-yellow-400 font-bold text-3xl relative z-10">SPECIAL EXPANDING SYMBOL</p>
+              </>
             )}
           </div>
-        ) : showActionWheel ? (
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
-            <p className="text-yellow-400 font-bold text-3xl">ACTION GAMES</p>
-          </div>
-        ) : (
-          <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 border-4 border-yellow-400/50 h-[40%] min-h-[550px] mt-[100px] ml-[15px]">
-            <p className="text-yellow-400 font-bold text-3xl">10 PENNY GAMES</p>
-            <p className="text-yellow-400 font-bold text-3xl">+</p>
-            <p className="text-yellow-400 font-bold text-3xl">SPECIAL EXPANDING SYMBOL</p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

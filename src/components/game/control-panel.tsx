@@ -22,7 +22,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InfoDialog } from "./info-dialog";
-import { AudioSettingsDialog } from "./audio-settings-dialog";
 import { Plus, Minus } from "lucide-react";
 import { useGameConfig } from '@/hooks/use-game-config';
 
@@ -103,10 +102,18 @@ interface ControlPanelProps {
  * @param value - Value to display (number or string)
  * @param isCurrency - Whether to format as currency (adds "R" prefix)
  */
-const InfoDisplay = ({ label, value, isCurrency = true }: { label: string; value: number | string; isCurrency?: boolean }) => (
-    <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full info-display-bg flex-[3] min-w-[120px]">
-        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
-        <span className="text-6xl font-bold cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif' }}>
+const InfoDisplay = ({ label, value, isCurrency = true, backgroundImage }: { label: string; value: number | string; isCurrency?: boolean; backgroundImage?: string }) => (
+    <div 
+        className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full info-display-bg flex-[3] min-w-[120px] relative"
+        style={backgroundImage ? {
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+        } : {}}
+    >
+        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
+        <span className="text-6xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
             {isCurrency ? `R${value}` : value}
         </span>
     </div>
@@ -169,39 +176,85 @@ export function ControlPanel({
         {/* Desktop layout - single horizontal line */}
         <div className="hidden sm:flex items-stretch justify-between gap-0 h-full min-h-[120px] md:min-h-[140px] lg:min-h-[160px]">
             {/* Balance */}
-            <InfoDisplay label="Balance" value={(balance ?? 0).toFixed(2)} />
+            <InfoDisplay label="Balance" value={(balance ?? 0).toFixed(2)} backgroundImage="/frame/frame-balance.png" />
             
             {/* Bet Amount */}
             {!isFreeSpinsMode && (
-                <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full info-display-bg flex-[3] min-w-[120px]">
-                    <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0" style={{ fontFamily: 'Cinzel, serif' }}>Bet</span>
-                    <div className="flex items-center gap-1 justify-center w-full">
-                        <Button variant="ghost" size="icon" className="h-12 w-12 md:h-16 md:w-16 hover:text-cyan-200 bet-button-icon" onClick={onIncreaseBet} disabled={isSpinning}>
-                            <Plus className="h-8 w-8 md:h-10 md:w-10" />
+                <div 
+                    className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full info-display-bg flex-[3] min-w-[120px] relative"
+                    style={{
+                        backgroundImage: 'url(/frame/frame-bet.png)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat'
+                    }}
+                >
+                    <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif',  marginTop: '25px' }}>Bet</span>
+                    <div className="flex items-center gap-1 justify-center w-full relative z-10">
+                        <Button variant="ghost" size="icon" className="h-16 w-16 md:h-20 md:w-20 hover:text-cyan-200 bet-button-icon !p-0" onClick={onIncreaseBet} disabled={isSpinning} style={{ padding: 0 }}>
+                            <Plus style={{ width: '80px', height: '80px', minWidth: '80px', minHeight: '80px' }} />
                         </Button>
-                        <span className="text-6xl font-bold px-1 cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif' }}>
+                        <span className="text-6xl font-bold px-1 cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif', }}>
                             R{totalBet.toFixed(2)}
                         </span>
-                        <Button variant="ghost" size="icon" className="h-12 w-12 md:h-16 md:w-16 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>
-                            <Minus className="h-8 w-8 md:h-10 md:w-10" />
+                        <Button variant="ghost" size="icon" className="h-16 w-16 md:h-20 md:w-20 hover:text-cyan-200 bet-button-icon !p-0" onClick={onDecreaseBet} disabled={isSpinning} style={{ padding: 0 }}>
+                            <Minus style={{ width: '80px', height: '80px', minWidth: '80px', minHeight: '80px' }} />
                         </Button>
                     </div>
                 </div>
             )}
             {isFreeSpinsMode && (
-                <InfoDisplay label="Penny Spins" value={freeSpinsRemaining} isCurrency={false} />
+                <div 
+                    className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full flex-[3] min-w-[120px] relative"
+                    style={{
+                        backgroundImage: 'url(/frame/frame-bet.png)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat'
+                    }}
+                >
+                    <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full w-full relative" style={{ background: 'transparent' }}>
+                        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>Penny Spins</span>
+                        <span className="text-6xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
+                            {freeSpinsRemaining}
+                        </span>
+                    </div>
+                </div>
             )}
             {actionGameSpins > 0 && !isFreeSpinsMode && (
-                <InfoDisplay label="Action Spins" value={actionGameSpins} isCurrency={false} />
+                <div 
+                    className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full flex-[3] min-w-[120px] relative"
+                    style={{
+                        backgroundImage: 'url(/frame/frame-bet.png)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat'
+                    }}
+                >
+                    <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full w-full relative" style={{ background: 'transparent' }}>
+                        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>Action Spins</span>
+                        <span className="text-6xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
+                            {actionGameSpins}
+                        </span>
+                    </div>
+                </div>
             )}
 
             {/* Win */}
-            <InfoDisplay label="Win" value={(lastWin ?? 0).toFixed(2)} />
+            <InfoDisplay label="Win" value={(lastWin ?? 0).toFixed(2)} backgroundImage="/frame/frame-win.png" />
         
             {/* Info and Audio Settings */}
-            <div className="flex items-center justify-center gap-2 p-0 rounded-md text-center h-full info-display-bg flex-[1] min-w-[120px]">
-                <InfoDialog totalBet={totalBet} />
-                <AudioSettingsDialog 
+            <div 
+                className="flex items-center justify-center gap-0 p-0 rounded-md text-center h-full info-display-bg flex-[1] min-w-[120px] relative"
+                style={{
+                    backgroundImage: 'url(/frame/frame-icon.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            >
+                <InfoDialog 
+                  totalBet={totalBet}
                   isMusicEnabled={isMusicEnabled}
                   onToggleMusic={onToggleMusic}
                   isSfxEnabled={isSfxEnabled}
@@ -257,9 +310,9 @@ export function ControlPanel({
                     <MobileInfoDisplay label="Balance" value={(balance ?? 0).toFixed(2)} />
                 </div>
                 <div className="flex-1">
-                    <div className="flex items-center justify-center gap-2 p-1 rounded-md text-center min-h-[48px] info-display-bg">
-                    <InfoDialog totalBet={totalBet} />
-                    <AudioSettingsDialog 
+                    <div className="flex items-center justify-center gap-0 p-0 rounded-md text-center min-h-[48px] info-display-bg">
+                    <InfoDialog 
+                      totalBet={totalBet}
                       isMusicEnabled={isMusicEnabled}
                       onToggleMusic={onToggleMusic}
                       isSfxEnabled={isSfxEnabled}
