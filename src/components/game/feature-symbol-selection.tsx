@@ -112,13 +112,7 @@ export function FeatureSymbolSelection({
   return (
     <div className="w-full h-full flex items-center justify-center" style={{ transform: 'translateY(50px)' }}>
       <div 
-        className="relative flex flex-col items-center justify-center p-6 sm:p-8 md:p-10 rounded-2xl border-4 border-yellow-400 shadow-2xl max-w-4xl w-full mx-4"
-        style={{
-          backgroundImage: 'url(/images/backround/bg.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
+        className="relative flex flex-col items-center justify-center p-6 sm:p-8 md:p-10 rounded-2xl border-4 border-yellow-400 shadow-2xl max-w-4xl w-full mx-4 bg-transparent"
       >
         <h2 className="text-4xl sm:text-5xl font-bold text-yellow-200 mb-6 uppercase tracking-wider text-center">
           Penny Spins!

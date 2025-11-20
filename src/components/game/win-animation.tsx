@@ -228,7 +228,7 @@ export function WinAnimation({ feedback, onAnimationComplete, onCountComplete }:
       <div className="absolute inset-0 overflow-hidden">
         {(feedback.animationType?.includes('coin') || !feedback.animationType) && coins.map(id => <Coin key={id} id={id} onEnded={handleCoinEnd} />)}
       </div>
-      <div className="absolute inset-0 flex items-center justify-center p-4">
+      <div className="absolute inset-0 flex items-end justify-center p-4" style={{ paddingBottom: '600px' }}>
         <div className="bg-black/70 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl shadow-2xl border-2 border-yellow-400 max-w-[90%] sm:max-w-lg text-center animate-fade-in-scale">
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-headline text-yellow-400 drop-shadow-lg leading-tight mb-2">
                 {feedback.feedbackText}

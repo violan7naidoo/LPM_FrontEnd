@@ -113,7 +113,7 @@ const InfoDisplay = ({ label, value, isCurrency = true, backgroundImage }: { lab
         } : {}}
     >
         <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
-        <span className="text-6xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
+        <span className="text-4xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
             {isCurrency ? `R${value}` : value}
         </span>
     </div>
@@ -192,13 +192,13 @@ export function ControlPanel({
                     <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif',  marginTop: '25px' }}>Bet</span>
                     <div className="flex items-center gap-1 justify-center w-full relative z-10">
                         <Button variant="ghost" size="icon" className="h-16 w-16 md:h-20 md:w-20 hover:text-cyan-200 bet-button-icon !p-0" onClick={onIncreaseBet} disabled={isSpinning} style={{ padding: 0 }}>
-                            <Plus style={{ width: '80px', height: '80px', minWidth: '80px', minHeight: '80px' }} />
+                            <Plus style={{ width: '60px', height: '60px', minWidth: '80px', minHeight: '80px', marginTop: '-15px' }} />
                         </Button>
-                        <span className="text-6xl font-bold px-1 cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif', }}>
+                        <span className="text-4xl font-bold px-1 cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif', marginTop: '-15px' }}>
                             R{totalBet.toFixed(2)}
                         </span>
                         <Button variant="ghost" size="icon" className="h-16 w-16 md:h-20 md:w-20 hover:text-cyan-200 bet-button-icon !p-0" onClick={onDecreaseBet} disabled={isSpinning} style={{ padding: 0 }}>
-                            <Minus style={{ width: '80px', height: '80px', minWidth: '80px', minHeight: '80px' }} />
+                            <Minus style={{ width: '60px', height: '60px', minWidth: '80px', minHeight: '80px', marginTop: '-15px' }} />
                         </Button>
                     </div>
                 </div>
@@ -215,7 +215,7 @@ export function ControlPanel({
                 >
                     <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full w-full relative" style={{ background: 'transparent' }}>
                         <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>Penny Spins</span>
-                        <span className="text-6xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
+                        <span className="text-4xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
                             {freeSpinsRemaining}
                         </span>
                     </div>
@@ -233,7 +233,7 @@ export function ControlPanel({
                 >
                     <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full w-full relative" style={{ background: 'transparent' }}>
                         <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>Action Spins</span>
-                        <span className="text-6xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
+                        <span className="text-4xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
                             {actionGameSpins}
                         </span>
                     </div>
@@ -245,12 +245,13 @@ export function ControlPanel({
         
             {/* Info and Audio Settings */}
             <div 
-                className="flex items-center justify-center gap-0 p-0 rounded-md text-center h-full info-display-bg flex-[1] min-w-[120px] relative"
+                className="flex items-center justify-center gap-0 rounded-md text-center h-full info-display-bg flex-[1] min-w-[120px] relative"
                 style={{
                     backgroundImage: 'url(/frame/frame-icon.png)',
-                    backgroundSize: '100% 100%',
+                    backgroundSize: '90% 90%',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
+                    
                 }}
             >
                 <InfoDialog 

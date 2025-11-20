@@ -206,15 +206,15 @@ export function MiddleSection({
       ) : (
         <canvas
           ref={canvasRef}
-          className="absolute object-contain"
+          className="absolute object-auto"
           style={{ 
             display: imagesLoaded ? 'block' : 'none',
-            top: '45px',
+            top: '65px',
             left: 0,
             right: 0,
             width: '100%',
             height: '100%',
-            zIndex: 5
+            zIndex: 15
           }}
         />
       )}

@@ -102,7 +102,12 @@ function PayCell({
     return (
       <p key={count} className="text-white text-3xl leading-tight">
         {count}x{' '}
-        <span className="text-yellow-400 font-bold">
+        <span className="font-bold" style={{ 
+          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
           {pay.toFixed(2)}
         </span>
         {ag > 0 && (
@@ -213,7 +218,12 @@ function LowPayCell({
     return (
       <p key={count} className="text-white text-3xl leading-tight">
         {count}x{' '}
-        <span className="text-yellow-400 font-bold">
+        <span className="font-bold" style={{ 
+          background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
           {pay.toFixed(2)}
         </span>
         {ag > 0 && (
@@ -426,7 +436,12 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
                   return (
                     <p key={count} className="text-white text-3xl leading-tight">
                       {count}x{' '}
-                      <span className="text-yellow-400 font-bold">
+                      <span className="font-bold" style={{ 
+                        background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text'
+                      }}>
                         {pay.toFixed(2)}
                       </span>
                       {ag > 0 && (
@@ -552,7 +567,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - Positioned absolutely within the grid to sit between left and right blocks
           - Does not affect grid flow
         */}
-        <div className="col-span-2 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none" style={{ marginTop: '100px', marginLeft: '15px' }}>
+        <div className="col-span-2 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none" style={{ marginTop: '100px', marginLeft: '35px' }}>
           <div className="flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 w-[500px] h-[550px] relative pointer-events-auto" style={{ border: 'none' }}>
             {/* Border image overlay */}
             <div
@@ -566,14 +581,29 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
               }}
             />
             {actionGamesFinished ? (
-              <p className="text-yellow-400 font-bold text-3xl relative z-10">ACTION GAMES FINISHED</p>
+              <p className="font-bold text-3xl relative z-10" style={{ 
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>ACTION GAMES FINISHED</p>
             ) : showActionWheel && actionGameWinMessage ? (
               <>
-                <p className="text-yellow-400 font-bold text-2xl sm:text-3xl md:text-4xl mb-4 text-center relative z-10">
+                <p className="font-bold text-2xl sm:text-3xl md:text-4xl mb-4 text-center relative z-10" style={{ 
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
                   {actionGameWinMessage}
                 </p>
                 {actionGameWinAmount && actionGameWinAmount > 0 && (
-                  <p className="text-yellow-400 font-bold text-3xl sm:text-4xl md:text-5xl relative z-10">
+                  <p className="font-bold text-3xl sm:text-4xl md:text-5xl relative z-10" style={{ 
+                    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}>
                     R {actionGameWinAmount.toFixed(2)}
                   </p>
                 )}
@@ -581,7 +611,12 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
             ) : isFreeSpinsMode && featureSymbol ? (
               // Show expanding symbol during free spins (not just after expansion)
               <>
-                <p className="text-yellow-400 font-bold text-2xl mb-4 relative z-10">EXPANDING SYMBOL</p>
+                <p className="font-bold text-2xl mb-4 relative z-10" style={{ 
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>EXPANDING SYMBOL</p>
                 {config?.symbols?.[featureSymbol]?.image ? (
                   <div className="relative w-80 h-80 flex items-center justify-center z-10">
                     <Image
@@ -594,16 +629,41 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
                     />
                   </div>
                 ) : (
-                  <p className="text-yellow-400 font-bold text-4xl mt-4 relative z-10">{featureSymbol}</p>
+                  <p className="font-bold text-4xl mt-4 relative z-10" style={{ 
+                    background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}>{featureSymbol}</p>
                 )}
               </>
             ) : showActionWheel ? (
-              <p className="text-yellow-400 font-bold text-3xl relative z-10">ACTION GAMES</p>
+              <p className="font-bold text-3xl relative z-10" style={{ 
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>ACTION GAMES</p>
             ) : (
               <>
-                <p className="text-yellow-400 font-bold text-3xl relative z-10">10 PENNY GAMES</p>
-                <p className="text-yellow-400 font-bold text-3xl relative z-10">+</p>
-                <p className="text-yellow-400 font-bold text-3xl relative z-10">SPECIAL EXPANDING SYMBOL</p>
+                <p className="font-bold text-3xl relative z-10" style={{ 
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>10 PENNY GAMES</p>
+                <p className="font-bold text-3xl relative z-10" style={{ 
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>+</p>
+                <p className="font-bold text-3xl relative z-10" style={{ 
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>SPECIAL EXPANDING SYMBOL</p>
               </>
             )}
           </div>
