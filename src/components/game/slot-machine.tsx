@@ -1190,11 +1190,7 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
     <>
       <div className="flex flex-col w-full h-full min-h-0">
         <div className="flex flex-col items-center justify-center flex-1 w-full min-h-0 overflow-hidden">
-          <div className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-card/50 border-2 md:border-4 shadow-2xl w-full h-full relative flex-1 min-h-0 ${
-            isFreeSpinsMode
-              ? 'border-yellow-400'
-              : 'border-primary/50'
-          }`}>
+          <div className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-card/50 border-2 md:border-4 shadow-2xl w-full h-full relative flex-1 min-h-0 border-transparent`}>
             {/* Frame overlay - positioned to match the grid border area */}
             <div className="absolute inset-0 pointer-events-none z-[5]" style={{ transform: 'scale(1)' }}>
               <img
