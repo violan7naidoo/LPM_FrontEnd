@@ -138,24 +138,29 @@ export function MiddleSection({
         if (currentImage && currentImage.complete) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           
+          // Scale factor to fit image without getting cut out (similar to title image scaling)
+          const scaleFactor = 0.90; // Adjust this value to scale the image (0.95 = 95% size)
+          
           // Calculate aspect ratio and scaling
           const imgAspect = currentImage.width / currentImage.height;
           const canvasAspect = canvas.width / canvas.height;
           
-          let drawWidth = canvas.width;
-          let drawHeight = canvas.height;
+          let drawWidth = canvas.width * scaleFactor;
+          let drawHeight = canvas.height * scaleFactor;
           let offsetX = 0;
           let offsetY = 0;
           
           if (imgAspect > canvasAspect) {
             // Image is wider - fit to height
-            drawHeight = canvas.height;
+            drawHeight = canvas.height * scaleFactor;
             drawWidth = drawHeight * imgAspect;
             offsetX = (canvas.width - drawWidth) / 2;
+            offsetY = (canvas.height - drawHeight) / 2;
           } else {
             // Image is taller - fit to width
-            drawWidth = canvas.width;
+            drawWidth = canvas.width * scaleFactor;
             drawHeight = drawWidth / imgAspect;
+            offsetX = (canvas.width - drawWidth) / 2;
             offsetY = (canvas.height - drawHeight) / 2;
           }
           
@@ -209,7 +214,7 @@ export function MiddleSection({
           className="absolute object-auto"
           style={{ 
             display: imagesLoaded ? 'block' : 'none',
-            top: '65px',
+            top: '90px',
             left: 0,
             right: 0,
             width: '100%',
