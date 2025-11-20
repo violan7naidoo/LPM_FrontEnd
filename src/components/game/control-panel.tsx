@@ -112,8 +112,13 @@ const InfoDisplay = ({ label, value, isCurrency = true, backgroundImage }: { lab
             backgroundRepeat: 'no-repeat'
         } : {}}
     >
-        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
-        <span className="text-4xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
+        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10">{label}</span>
+        <span className="text-4xl font-bold leading-none relative z-10" style={{ 
+            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+        }}>
             {isCurrency ? `R${value}` : value}
         </span>
     </div>
@@ -131,8 +136,13 @@ const InfoDisplay = ({ label, value, isCurrency = true, backgroundImage }: { lab
  */
 const MobileInfoDisplay = ({ label, value, isCurrency = true }: { label: string; value: number | string; isCurrency?: boolean }) => (
     <div className="flex flex-col items-center justify-center p-1 rounded-md w-full text-center min-h-[48px] info-display-bg">
-        <span className="text-[10px] uppercase tracking-widest subtle-cyan-text" style={{ fontFamily: 'Cinzel, serif' }}>{label}</span>
-        <span className="text-base font-bold cyan-text-glow" style={{ fontFamily: 'Cinzel, serif' }}>
+        <span className="text-[10px] uppercase tracking-widest subtle-cyan-text">{label}</span>
+        <span className="text-base font-bold" style={{ 
+            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+        }}>
             {isCurrency ? `R${value}` : value}
         </span>
     </div>
@@ -189,12 +199,18 @@ export function ControlPanel({
                         backgroundRepeat: 'no-repeat'
                     }}
                 >
-                    <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif',  marginTop: '25px' }}>Bet</span>
+                    <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ marginTop: '25px' }}>Bet</span>
                     <div className="flex items-center gap-1 justify-center w-full relative z-10">
                         <Button variant="ghost" size="icon" className="h-16 w-16 md:h-20 md:w-20 hover:text-cyan-200 bet-button-icon !p-0" onClick={onIncreaseBet} disabled={isSpinning} style={{ padding: 0 }}>
                             <Plus style={{ width: '60px', height: '60px', minWidth: '80px', minHeight: '80px', marginTop: '-15px' }} />
                         </Button>
-                        <span className="text-4xl font-bold px-1 cyan-text-glow leading-none" style={{ fontFamily: 'Cinzel, serif', marginTop: '-15px' }}>
+                        <span className="text-4xl font-bold px-1 leading-none" style={{ 
+                            marginTop: '-15px',
+                            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}>
                             R{totalBet.toFixed(2)}
                         </span>
                         <Button variant="ghost" size="icon" className="h-16 w-16 md:h-20 md:w-20 hover:text-cyan-200 bet-button-icon !p-0" onClick={onDecreaseBet} disabled={isSpinning} style={{ padding: 0 }}>
@@ -214,8 +230,13 @@ export function ControlPanel({
                     }}
                 >
                     <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full w-full relative" style={{ background: 'transparent' }}>
-                        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>Penny Spins</span>
-                        <span className="text-4xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
+                        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10">Penny Spins</span>
+                        <span className="text-4xl font-bold leading-none relative z-10" style={{ 
+                            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}>
                             {freeSpinsRemaining}
                         </span>
                     </div>
@@ -232,8 +253,13 @@ export function ControlPanel({
                     }}
                 >
                     <div className="flex flex-col items-center justify-center p-0 rounded-md text-center h-full w-full relative" style={{ background: 'transparent' }}>
-                        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>Action Spins</span>
-                        <span className="text-4xl font-bold cyan-text-glow leading-none relative z-10" style={{ fontFamily: 'Cinzel, serif' }}>
+                        <span className="text-4xl uppercase tracking-widest subtle-cyan-text mb-0 relative z-10">Action Spins</span>
+                        <span className="text-4xl font-bold leading-none relative z-10" style={{ 
+                            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text'
+                        }}>
                             {actionGameSpins}
                         </span>
                     </div>
@@ -277,12 +303,17 @@ export function ControlPanel({
                     <>
                         <div className="flex-1">
                             <div className="flex flex-col items-center justify-center p-1 rounded-md text-center min-h-[48px] info-display-bg">
-                                <span className="text-[8px] uppercase tracking-widest subtle-cyan-text" style={{ fontFamily: 'Cinzel, serif' }}>Bet</span>
+                                <span className="text-[8px] uppercase tracking-widest subtle-cyan-text">Bet</span>
                                 <div className="flex items-center gap-0.5 justify-center w-full mt-0.5">
                                     <Button variant="ghost" size="icon" className="h-4 w-4 hover:text-cyan-200 bet-button-icon" onClick={onIncreaseBet} disabled={isSpinning}>
                                         <Plus className="h-3 w-3" />
                                     </Button>
-                                    <span className="text-sm font-bold px-1 cyan-text-glow" style={{ fontFamily: 'Cinzel, serif' }}>
+                                    <span className="text-sm font-bold px-1" style={{ 
+                                        background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        backgroundClip: 'text'
+                                    }}>
                                         R{totalBet.toFixed(2)}
                                     </span>
                                     <Button variant="ghost" size="icon" className="h-4 w-4 hover:text-cyan-200 bet-button-icon" onClick={onDecreaseBet} disabled={isSpinning}>

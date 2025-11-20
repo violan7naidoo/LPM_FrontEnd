@@ -476,7 +476,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
               - Shows which symbols can act as wilds/substitutes
             */}
             <div className="flex flex-col gap-4 items-center">
-              <p className="text-blue-400 font-bold text-4xl" style={{ fontFamily: 'Cinzel, serif' }}>SUBSTITUTES FOR</p>
+              <p className="text-blue-400 font-bold text-4xl">SUBSTITUTES FOR</p>
               <div className="flex gap-2">
                 {substituteSymbols.slice(0, 4).map((symbolId) => {
                   const symbol = config.symbols[symbolId];
@@ -566,10 +566,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           Middle block - "10 PENNY GAMES" / Feature Symbol / Action Games
           - Positioned absolutely within the grid to sit between left and right blocks
           - Does not affect grid flow
-          - Has 10px margins on both left and right sides
+          - Has 10px margins on both left and right sides to prevent overlapping
         */}
-        <div className="col-span-2 absolute top-1/2 transform -translate-y-1/2 flex items-center justify-center pointer-events-none" style={{ marginTop: '100px', left: '10px', right: '10px', width: 'calc(100% - 20px)' }}>
-          <div className="flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 w-[500px] h-[550px] relative pointer-events-auto mx-auto" style={{ border: 'none' }}>
+        <div className="col-span-2 absolute top-1/2 transform -translate-y-1/2 flex items-center justify-center pointer-events-none" style={{ marginTop: '100px', left: '10px', right: '10px' }}>
+          <div className="flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 w-[500px] h-[550px] relative pointer-events-auto" style={{ border: 'none', marginLeft: '10px', marginRight: '10px' }}>
             {/* Border image overlay */}
             <div
               className="absolute inset-0 pointer-events-none"

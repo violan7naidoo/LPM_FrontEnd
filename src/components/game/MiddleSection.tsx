@@ -103,14 +103,26 @@ export function MiddleSection({
     const container = containerRef.current;
     if (!canvas || !container) return;
     
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { 
+      alpha: true,
+      desynchronized: true,
+      willReadFrequently: false
+    });
     if (!ctx) return;
     
-    // Set canvas size to match container
+    // Optimize canvas rendering settings
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    
+    // Set canvas size to match container with device pixel ratio for crisp rendering
     const resizeCanvas = () => {
       const rect = container.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      ctx.scale(dpr, dpr);
     };
     
     resizeCanvas();
@@ -136,34 +148,28 @@ export function MiddleSection({
         // Draw current frame
         const currentImage = imagesRef.current[currentFrameRef.current];
         if (currentImage && currentImage.complete) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          
-          // Scale factor to fit image without getting cut out (similar to title image scaling)
-          const scaleFactor = 0.90; // Adjust this value to scale the image (0.95 = 95% size)
-          
-          // Calculate aspect ratio and scaling
+          // Calculate scaling (cached per frame to avoid recalculation)
+          const scaleFactor = 0.90;
           const imgAspect = currentImage.width / currentImage.height;
-          const canvasAspect = canvas.width / canvas.height;
+          const canvasAspect = (canvas.width / (window.devicePixelRatio || 1)) / (canvas.height / (window.devicePixelRatio || 1));
           
-          let drawWidth = canvas.width * scaleFactor;
-          let drawHeight = canvas.height * scaleFactor;
-          let offsetX = 0;
-          let offsetY = 0;
+          let drawWidth, drawHeight, offsetX, offsetY;
           
           if (imgAspect > canvasAspect) {
             // Image is wider - fit to height
-            drawHeight = canvas.height * scaleFactor;
+            drawHeight = (canvas.height / (window.devicePixelRatio || 1)) * scaleFactor;
             drawWidth = drawHeight * imgAspect;
-            offsetX = (canvas.width - drawWidth) / 2;
-            offsetY = (canvas.height - drawHeight) / 2;
+            offsetX = ((canvas.width / (window.devicePixelRatio || 1)) - drawWidth) / 2;
+            offsetY = ((canvas.height / (window.devicePixelRatio || 1)) - drawHeight) / 2;
           } else {
             // Image is taller - fit to width
-            drawWidth = canvas.width * scaleFactor;
+            drawWidth = (canvas.width / (window.devicePixelRatio || 1)) * scaleFactor;
             drawHeight = drawWidth / imgAspect;
-            offsetX = (canvas.width - drawWidth) / 2;
-            offsetY = (canvas.height - drawHeight) / 2;
+            offsetX = ((canvas.width / (window.devicePixelRatio || 1)) - drawWidth) / 2;
+            offsetY = ((canvas.height / (window.devicePixelRatio || 1)) - drawHeight) / 2;
           }
           
+          ctx.clearRect(0, 0, canvas.width / (window.devicePixelRatio || 1), canvas.height / (window.devicePixelRatio || 1));
           ctx.drawImage(currentImage, offsetX, offsetY, drawWidth, drawHeight);
         }
       }

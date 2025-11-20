@@ -400,7 +400,6 @@
  * - Letter spacing for elegance
  */
 .slot-game-title {
-  font-family: 'Cinzel', serif;
   background: linear-gradient(135deg, #00aaff 0%, #44ddff 50%, #aaffff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
