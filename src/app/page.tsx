@@ -288,7 +288,7 @@ export default function Home() {
       <BackgroundAnimation isFreeSpinsMode={isFreeSpinsMode} />
       
       {/* Game Title at the top */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-center z-20" style={{ height: '200px', transform: 'translateY(100px)' }}>
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-center z-20" style={{ height: '200px', transform: 'translateY(0px)' }}>
         <Image
           src="/title/title.png"
           alt="Snow Kingdom"
