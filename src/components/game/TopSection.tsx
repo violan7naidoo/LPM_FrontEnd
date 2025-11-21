@@ -569,7 +569,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           - Has 10px margins on both left and right sides to prevent overlapping
         */}
         <div className="col-span-2 absolute top-1/2 transform -translate-y-1/2 flex items-center justify-center pointer-events-none" style={{ marginTop: '100px', left: '10px', right: '10px' }}>
-          <div className="flex flex-col items-center justify-center bg-black/40 rounded-lg p-8 w-[500px] h-[550px] relative pointer-events-auto" style={{ border: 'none', marginLeft: '10px', marginRight: '10px' }}>
+          <div className="flex flex-col items-center justify-center bg-black/40 rounded-lg p-6 w-[400px] h-[450px] relative pointer-events-auto" style={{ border: 'none', marginLeft: '10px', marginRight: '10px' }}>
             {/* Border image overlay */}
             <div
               className="absolute inset-0 pointer-events-none"
@@ -582,7 +582,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
               }}
             />
             {actionGamesFinished ? (
-              <p className="font-bold text-3xl relative z-10" style={{ 
+              <p className="font-bold text-2xl relative z-10" style={{ 
                 background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -590,7 +590,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
               }}>ACTION GAMES FINISHED</p>
             ) : showActionWheel && actionGameWinMessage ? (
               <>
-                <p className="font-bold text-2xl sm:text-3xl md:text-4xl mb-4 text-center relative z-10" style={{ 
+                <p className="font-bold text-xl sm:text-2xl md:text-2xl mb-3 text-center relative z-10" style={{ 
                   background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
@@ -599,7 +599,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
                   {actionGameWinMessage}
                 </p>
                 {actionGameWinAmount && actionGameWinAmount > 0 && (
-                  <p className="font-bold text-3xl sm:text-4xl md:text-5xl relative z-10" style={{ 
+                  <p className="font-bold text-2xl sm:text-3xl md:text-3xl relative z-10" style={{ 
                     background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -612,19 +612,19 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
             ) : isFreeSpinsMode && featureSymbol ? (
               // Show expanding symbol during free spins (not just after expansion)
               <>
-                <p className="font-bold text-2xl mb-4 relative z-10" style={{ 
+                <p className="font-bold text-xl mb-3 relative z-10" style={{ 
                   background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
                 }}>EXPANDING SYMBOL</p>
                 {config?.symbols?.[featureSymbol]?.image ? (
-                  <div className="relative w-80 h-80 flex items-center justify-center z-10">
+                  <div className="relative w-60 h-60 flex items-center justify-center z-10">
                     <Image
                       src={config.symbols[featureSymbol].image}
                       alt={featureSymbol}
-                      width={320}
-                      height={320}
+                      width={240}
+                      height={240}
                       className="object-contain"
                       unoptimized
                     />
@@ -639,7 +639,7 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
                 )}
               </>
             ) : showActionWheel ? (
-              <p className="font-bold text-3xl relative z-10" style={{ 
+              <p className="font-bold text-2xl relative z-10" style={{ 
                 background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -647,19 +647,19 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
               }}>ACTION GAMES</p>
             ) : (
               <>
-                <p className="font-bold text-3xl relative z-10" style={{ 
+                <p className="font-bold text-2xl relative z-10" style={{ 
                   background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
                 }}>10 PENNY GAMES</p>
-                <p className="font-bold text-3xl relative z-10" style={{ 
+                <p className="font-bold text-2xl relative z-10" style={{ 
                   background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
                 }}>+</p>
-                <p className="font-bold text-3xl relative z-10" style={{ 
+                <p className="font-bold text-2xl relative z-10" style={{ 
                   background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
