@@ -277,6 +277,46 @@ class GameApiService {
       'POST'
     );
   }
+
+  /**
+   * Dev mode: Force trigger free spins
+   * 
+   * Only available in development mode. Forces a spin that triggers free spins.
+   * 
+   * @param request - Dev trigger free spins request
+   * @returns Promise resolving to play response with free spins triggered
+   */
+  async devTriggerFreeSpins(request: { sessionId: string; betAmount?: number; numPaylines?: number; betPerPayline?: number; gameId?: string }): Promise<PlayResponse> {
+    const gameIdToUse = request.gameId || getGameId();
+    return this.makeRequest<PlayResponse>(
+      '/dev/trigger-free-spins',
+      'POST',
+      {
+        ...request,
+        gameId: gameIdToUse,
+      }
+    );
+  }
+
+  /**
+   * Dev mode: Force trigger action games
+   * 
+   * Only available in development mode. Forces a spin that triggers action games.
+   * 
+   * @param request - Dev trigger action games request
+   * @returns Promise resolving to play response with action games triggered
+   */
+  async devTriggerActionGames(request: { sessionId: string; betAmount?: number; numPaylines?: number; betPerPayline?: number; gameId?: string }): Promise<PlayResponse> {
+    const gameIdToUse = request.gameId || getGameId();
+    return this.makeRequest<PlayResponse>(
+      '/dev/trigger-action-games',
+      'POST',
+      {
+        ...request,
+        gameId: gameIdToUse,
+      }
+    );
+  }
 }
 
 /**

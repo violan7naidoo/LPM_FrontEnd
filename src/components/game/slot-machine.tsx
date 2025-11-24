@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, forwardRef, useImperativeHandle } from 'react';
 import { ReelColumn } from './reel-column';
 import { WinningLinesDisplay } from './winning-lines-display';
 import { PaylineNumbers } from './payline-numbers';
@@ -42,7 +42,17 @@ interface SlotMachineProps {
   showFeatureSymbolSelection?: boolean;
 }
 
-export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange, onActionWheelStateChange, onSessionIdChange, onBalanceUpdateCallback, showActionWheel = false, actionGameSpins = 0, accumulatedActionWin = 0, onActionWheelSpin, onActionWheelSpinTrigger, onFeatureSymbolSelectionStateChange, onFeatureGameWinsStateChange, showFeatureSymbolSelection = false }: SlotMachineProps) {
+export interface SlotMachineDevModeHandle {
+  triggerPennyGames: () => void;
+  triggerActionGames: () => void;
+  forceBigWin: () => Promise<void>;
+  addBalance: (amount: number) => void;
+  triggerMysteryPrize: () => void;
+  resetSession: () => Promise<void>;
+  triggerSpin: () => Promise<void>;
+}
+
+export const SlotMachine = forwardRef<SlotMachineDevModeHandle, SlotMachineProps>(function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange, onActionWheelStateChange, onSessionIdChange, onBalanceUpdateCallback, showActionWheel = false, actionGameSpins = 0, accumulatedActionWin = 0, onActionWheelSpin, onActionWheelSpinTrigger, onFeatureSymbolSelectionStateChange, onFeatureGameWinsStateChange, showFeatureSymbolSelection = false }, ref) {
   // Get config values from hooks
   const numReels = useNumReels();
   const numRows = useNumRows();
@@ -248,8 +258,247 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
   // Use ref to track if spin was cancelled (allows immediate cancellation)
   const spinCancelledRef = useRef(false);
   const currentSpinRef = useRef<Promise<any> | null>(null);
+  const spinFunctionRef = useRef<(() => Promise<any>) | null>(null);
 
   const isSpinning = useMemo(() => spinningReels.some(s => s), [spinningReels]);
+  
+  // Expose dev mode methods via ref (only in development)
+  useImperativeHandle(ref, (): SlotMachineDevModeHandle => {
+    if (process.env.NODE_ENV !== 'development') {
+      return {
+        triggerPennyGames: () => {},
+        triggerActionGames: () => {},
+        forceBigWin: async () => {},
+        addBalance: () => {},
+        triggerMysteryPrize: () => {},
+        resetSession: async () => {},
+        triggerSpin: async () => {},
+      };
+    }
+
+    return {
+      triggerPennyGames: async () => {
+        if (!sessionId || !config) return;
+        
+        try {
+          console.log('[DEV MODE] Triggering free spins via backend API...');
+          
+          // Call dev endpoint to force free spins trigger
+          const response: PlayResponse = await gameApi.devTriggerFreeSpins({
+            sessionId,
+            betAmount: betAmount,
+            numPaylines: numPaylines,
+            betPerPayline: betPerPayline,
+            gameId: gameId || 'BOOK_OF_RA',
+          });
+          
+          // Process the response similar to a normal spin
+          // Update balance
+          setBalance(response.player.balance);
+          
+          // Update free spins
+          setFreeSpinsRemaining(response.player.freeSpinsRemaining);
+          
+          // Update feature symbol if selected
+          if (response.player.results.featureSymbol) {
+            setFeatureSymbol(response.player.results.featureSymbol);
+          }
+          
+          // Update last win
+          setLastWin(response.player.lastWin);
+          
+          // Update grid
+          setGrid(response.player.results.grid);
+          
+          // Handle mystery prize if awarded
+          if (response.mysteryPrizeAwarded && response.mysteryPrizeAwarded > 0) {
+            console.log(`[DEV MODE] Mystery prize awarded: R${response.mysteryPrizeAwarded}`);
+            toast({
+              title: '🎁 Mystery Prize!',
+              description: `You've been awarded R${response.mysteryPrizeAwarded.toFixed(2)}!`,
+              duration: 5000,
+            });
+          }
+          
+          // If free spins were triggered, show feature symbol selection
+          if (response.player.freeSpinsRemaining > 0 && response.player.results.featureSymbol) {
+            const selectedSymbol = response.player.results.featureSymbol;
+            const spinsAwarded = response.player.freeSpinsRemaining;
+            
+            // Trigger feature symbol selection animation
+            if (onFeatureSymbolSelectionStateChange) {
+              onFeatureSymbolSelectionStateChange(true, selectedSymbol, spinsAwarded);
+            }
+            
+            // Notify parent
+            if (onFreeSpinsStateChange) {
+              onFreeSpinsStateChange(true, selectedSymbol);
+            }
+            
+            console.log(`[DEV MODE] Free spins triggered: ${spinsAwarded} spins with feature symbol: ${selectedSymbol}`);
+          } else {
+            console.log('[DEV MODE] Free spins trigger completed, but no free spins were awarded (may have retriggered)');
+          }
+        } catch (error) {
+          console.error('[DEV MODE] Error triggering penny games:', error);
+          toast({
+            variant: 'destructive',
+            title: 'Dev Mode Error',
+            description: `Failed to trigger free spins: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          });
+        }
+      },
+      
+      triggerActionGames: async () => {
+        if (!sessionId || !config) return;
+        
+        try {
+          console.log('[DEV MODE] Triggering action games via backend...');
+          
+          // Call backend dev endpoint to trigger action games
+          const response = await gameApi.devTriggerActionGames({
+            sessionId,
+            betAmount: betAmount,
+            numPaylines: numPaylines,
+            betPerPayline: betPerPayline,
+            gameId: config.gameId,
+          });
+          
+          // Update balance
+          if (onBalanceUpdateCallback) {
+            onBalanceUpdateCallback(response.player.balance);
+          }
+          
+          // Update action wheel state
+          if (onActionWheelStateChange) {
+            onActionWheelStateChange(true, response.actionGameSpins, response.player.accumulatedActionGameWin ?? 0);
+          }
+          
+          // Show success toast
+          toast({
+            title: '🎰 Action Games Triggered!',
+            description: `${response.actionGameSpins} action game spins awarded!`,
+            duration: 3000,
+          });
+          
+          console.log(`[DEV MODE] Action games triggered: ${response.actionGameSpins} spins`);
+        } catch (error) {
+          console.error('[DEV MODE] Error triggering action games:', error);
+          toast({
+            variant: 'destructive',
+            title: 'Dev Mode Error',
+            description: `Failed to trigger action games: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          });
+        }
+      },
+      
+      forceBigWin: async () => {
+        if (!sessionId || isSpinning) {
+          console.log('[DEV MODE] Cannot force big win - spinning or no session');
+          return;
+        }
+        
+        try {
+          // For now, just trigger a normal spin
+          // In a full implementation, you might want a backend dev endpoint that guarantees a big win
+          console.log('[DEV MODE] Forcing big win - triggering normal spin (backend will randomize)');
+          // Note: To truly force a big win, you'd need a backend dev endpoint
+          // For now, this just triggers a normal spin
+          toast({
+            title: 'Dev Mode',
+            description: 'Big win trigger - normal spin will be triggered (backend randomization)',
+          });
+        } catch (error) {
+          console.error('[DEV MODE] Error forcing big win:', error);
+        }
+      },
+      
+      addBalance: (amount: number = 100) => {
+        setBalance(prev => {
+          const newBalance = prev + amount;
+          console.log(`[DEV MODE] Added R${amount}. New balance: R${newBalance}`);
+          return newBalance;
+        });
+      },
+      
+      triggerMysteryPrize: () => {
+        // This would need backend support to force mystery prize
+        // For now, just log it
+        console.log('[DEV MODE] Mystery prize trigger - requires backend support');
+        toast({
+          title: 'Dev Mode',
+          description: 'Mystery prize trigger requires backend implementation',
+        });
+      },
+      
+      resetSession: async () => {
+        if (!sessionId) return;
+        
+        try {
+          await gameApi.resetSession(sessionId);
+          
+          // Reset all state
+          setBalance(500);
+          setFreeSpinsRemaining(0);
+          setFeatureSymbol('');
+          setLastWin(0);
+          setWinningLines([]);
+          setGrid(generateInitialGrid());
+          
+          // Reset action games via callback
+          if (onActionWheelStateChange) {
+            onActionWheelStateChange(false, 0, 0);
+          }
+          
+          // Reset session ID to trigger new session
+          const newSessionId = `session-${Date.now()}`;
+          setSessionId(newSessionId);
+          if (onSessionIdChange) {
+            onSessionIdChange(newSessionId);
+          }
+          
+          console.log('[DEV MODE] Session reset');
+        } catch (error) {
+          console.error('[DEV MODE] Error resetting session:', error);
+        }
+      },
+      
+      triggerSpin: async () => {
+        if (!sessionId || isSpinning) {
+          console.log('[DEV MODE] Cannot trigger spin - already spinning or no session');
+          return;
+        }
+        
+        try {
+          const spinFn = spinFunctionRef.current;
+          if (spinFn) {
+            await spinFn();
+          } else {
+            console.warn('[DEV MODE] Spin function not available yet');
+          }
+        } catch (error) {
+          console.error('[DEV MODE] Error triggering spin:', error);
+        }
+      },
+    };
+  }, [
+    sessionId,
+    config,
+    scatterSymbol,
+    freeSpinsAwarded,
+    isSpinning,
+    onFeatureSymbolSelectionStateChange,
+    onFreeSpinsStateChange,
+    onActionWheelStateChange,
+    onSessionIdChange,
+    generateInitialGrid,
+    toast,
+    betAmount,
+    numPaylines,
+    betPerPayline,
+    gameId,
+    gameApi,
+  ]);
   
   // Comprehensive animation state - tracks all animations that should prevent spinning
   const isAnimating = useMemo(() => {
@@ -856,13 +1105,28 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
       // Handle mystery prize if awarded
       if (response.mysteryPrizeAwarded && response.mysteryPrizeAwarded > 0) {
         console.log(`[MYSTERY PRIZE] Awarded R${response.mysteryPrizeAwarded}`);
+        
+        // Show mystery prize with win animation (custom message for mystery prize)
+        const mysteryPrizeFeedback = {
+          feedbackText: 'Mystery Prize:',
+          winAmount: response.mysteryPrizeAwarded,
+          animationType: 'coins'
+        };
+        setWinningFeedback(mysteryPrizeFeedback);
+        
+        // Also show toast for additional notification
         toast({
           title: '🎁 Mystery Prize!',
           description: `You've been awarded R${response.mysteryPrizeAwarded.toFixed(2)}!`,
           duration: 5000,
         });
-        // Play a special sound for mystery prize (if available)
-        // playMysteryPrizeSound();
+        
+        // Play win sound for mystery prize
+        if (response.mysteryPrizeAwarded >= totalBet * 10) {
+          playBigWinSound();
+        } else {
+          playWinSound();
+        }
       }
 
       // Handle action game wins - use backend's accumulated value if available
@@ -944,7 +1208,9 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         });
       }
 
-      if (response.player.lastWin > 0) {
+      // Handle regular wins (only if mystery prize was NOT awarded)
+      // Mystery prize is already handled above with its own animation
+      if (response.player.lastWin > 0 && (!response.mysteryPrizeAwarded || response.mysteryPrizeAwarded === 0)) {
           // Play win sound - big win for wins > 5x bet, regular win otherwise
           if (response.player.lastWin > totalBet * 5) {
             playBigWinSound();
@@ -1066,6 +1332,11 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isAnimating, sessionId, balance, totalBet, freeSpinsRemaining, actionGameSpins, spin, playClickSound, autoplayState.isActive, stopAutoplay, isFreeSpinsMode, handleIncreaseBet, handleDecreaseBet, showActionWheel, onActionWheelSpinTrigger]);
+
+  // Store spin function in ref for dev mode access
+  useEffect(() => {
+    spinFunctionRef.current = spin;
+  }, [spin]);
 
   // Autoplay effect - handles automatic spinning with stop conditions
   useEffect(() => {
@@ -1308,4 +1579,4 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
       )}
     </>
   );
-}
+});

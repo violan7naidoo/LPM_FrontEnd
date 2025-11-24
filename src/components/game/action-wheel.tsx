@@ -286,12 +286,6 @@ export const ActionWheel = forwardRef<ActionWheelHandle, ActionWheelProps>(({
                 <div className="text-[10px] font-bold text-red-600">AG</div>
                 <div className="text-2xl font-bold text-red-600">{totalActionSpins}</div>
                 <div className="text-[10px] font-bold text-red-600">SPINS</div>
-                {/* Only show accumulated win when all spins are complete */}
-                {accumulatedWin > 0 && totalActionSpins === 0 && (
-                  <div className="text-[10px] font-bold text-green-600 mt-0.5">
-                    R{accumulatedWin.toFixed(2)}
-                  </div>
-                )}
               </div>
             </div>
 
@@ -302,25 +296,6 @@ export const ActionWheel = forwardRef<ActionWheelHandle, ActionWheelProps>(({
           </div>
         </div>
 
-        {/* Result Display - Only show when all action spins are complete (totalActionSpins === 0) */}
-        {spinResult && totalActionSpins === 0 && (
-          <div className="mt-4 text-center">
-            <div className="text-2xl font-bold text-yellow-400">
-              {spinResult === 'R10' ? 'You won R10.00!' : 
-               spinResult === '6spins' ? 'You won 6 additional spins!' : 
-               'No win this spin'}
-            </div>
-          </div>
-        )}
-
-        {/* Accumulated Win Display - Only show when all action spins are complete (totalActionSpins === 0) */}
-        {accumulatedWin > 0 && totalActionSpins === 0 && (
-          <div className="mt-4 text-center">
-            <div className="text-lg text-white">
-              Total Accumulated: <span className="font-bold text-green-400">R{accumulatedWin.toFixed(2)}</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -31,6 +31,8 @@ import { BottomSection } from "@/components/game/BottomSection";
 import { BackgroundAnimation } from "@/components/game/BackgroundAnimation";
 import { useBetAmounts } from '@/lib/slot-config';
 import { gameApi } from '@/lib/game-api';
+import { useDevMode } from '@/hooks/use-dev-mode';
+import { type SlotMachineDevModeHandle } from '@/components/game/slot-machine';
 
 export default function Home() {
   // Get available bet amounts from config (e.g., [1.00, 2.00, 3.00, 5.00])
@@ -127,6 +129,34 @@ export default function Home() {
   const [selectedFeatureSymbol, setSelectedFeatureSymbol] = useState<string>('');
   const [freeSpinsCount, setFreeSpinsCount] = useState<number>(0);
   const [showFeatureGameWins, setShowFeatureGameWins] = useState(false);
+
+  // Dev mode ref for SlotMachine
+  const slotMachineRef = useRef<SlotMachineDevModeHandle>(null);
+
+  // Dev mode handlers
+  const devModeShortcuts = {
+    onTriggerPennyGames: () => {
+      slotMachineRef.current?.triggerPennyGames();
+    },
+    onTriggerActionGames: () => {
+      slotMachineRef.current?.triggerActionGames();
+    },
+    onForceBigWin: () => {
+      slotMachineRef.current?.forceBigWin();
+    },
+    onAddBalance: () => {
+      slotMachineRef.current?.addBalance(100);
+    },
+    onTriggerMysteryPrize: () => {
+      slotMachineRef.current?.triggerMysteryPrize();
+    },
+    onResetSession: () => {
+      slotMachineRef.current?.resetSession();
+    },
+  };
+
+  // Initialize dev mode hook
+  const { isDevModeActive } = useDevMode(devModeShortcuts);
 
   /**
    * Callback to handle free spins state changes from SlotMachine
@@ -321,8 +351,10 @@ export default function Home() {
         actionGameWinMessage={actionGameWinMessage}
         actionGameWinAmount={actionGameWinAmount}
         actionGamesFinished={actionGamesFinished}
+        accumulatedActionWin={accumulatedActionWin}
         showFeatureGameWins={showFeatureGameWins}
         showFeatureSymbolSelection={showFeatureSymbolSelection}
+        isDevModeActive={isDevModeActive}
       />
       <MiddleSection 
         showActionWheel={showActionWheel}
@@ -353,6 +385,7 @@ export default function Home() {
         onFeatureSymbolSelectionStateChange={handleFeatureSymbolSelectionStateChange}
         onFeatureGameWinsStateChange={setShowFeatureGameWins}
         showFeatureSymbolSelection={showFeatureSymbolSelection}
+        slotMachineRef={slotMachineRef}
       />
     </div>
   );

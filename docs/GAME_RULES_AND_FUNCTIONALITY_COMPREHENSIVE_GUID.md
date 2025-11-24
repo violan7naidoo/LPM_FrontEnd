@@ -140,13 +140,14 @@
 
 ### Free Spins Mechanics
 
-- ✅ No bet required
+- ⚠️ **R0.10 deduction per spin** (penny game bet)
 - ✅ Feature symbol expands to fill entire reel when it appears
 - ✅ Expanded reels show yellow border
 - ✅ Base game wins paid first (before expansion)
 - ✅ Feature game wins paid after expansion (if expansion occurs)
 - ✅ Scatter can retrigger free spins (10 additional spins)
 - ✅ If retriggered, feature symbol remains the same
+- ⚠️ Requires minimum balance of R0.10 per spin
 
 ### Expanding Symbol Rules
 
@@ -208,9 +209,10 @@
 
 ### Action Game Spins
 
-- ✅ No bet required
+- ⚠️ **R0.10 deduction per spin**
 - ✅ Each spin uses one action game spin
 - ✅ Wins from action wheel added to balance
+- ⚠️ Requires minimum balance of R0.10 per spin
 
 ---
 
@@ -247,16 +249,18 @@ Each symbol has its own action game trigger table based on:
 
 ### Free Spins Mode
 
-- ✅ No bet required
+- ⚠️ R0.10 deduction per spin (penny game bet)
 - ✅ Feature symbol expands reels
 - ✅ Can retrigger additional free spins
 - ⚠️ Action games accumulate (not shown)
+- ⚠️ R0.10 bets tracked for mystery prize
 
 ### Action Game Mode
 
-- ✅ No bet required
+- ⚠️ R0.10 deduction per spin
 - ✅ Spinning action wheel
 - ✅ Awards additional spins or cash prizes
+- ⚠️ R0.10 bets tracked for mystery prize
 
 ### Turbo Mode
 
@@ -349,8 +353,8 @@ Each symbol has its own action game trigger table based on:
 ### Bet Validation
 
 - ⚠️ Spin disabled if balance insufficient (base game)
-- ✅ Free spins don't require balance
-- ✅ Action games don't require balance
+- ⚠️ Free spins require R0.10 balance per spin
+- ⚠️ Action games require R0.10 balance per spin
 
 ### Bet Calculation
 
@@ -378,6 +382,10 @@ The following are tracked in session:
 - ✅ Action game spins
 - ✅ Feature symbol selected
 - ✅ Accumulated action game wins
+- ✅ Accumulated penny game bets (R0.10 deductions from free spins)
+- ✅ Accumulated action game bets (R0.10 deductions from action wheel spins)
+- ✅ Losing spins counter (for mystery prize tracking)
+- ✅ Last feature exit type (free spins or action games)
 
 ---
 
@@ -412,6 +420,58 @@ The following are tracked in session:
 | **Action games in base game** | Show wheel immediately |
 | **Action games during free spins** | Accumulate, show after free spins |
 | **Free spins + action games simultaneously** | Free spins play first, then action wheel |
+
+### Mystery Prize System
+
+#### Overview
+
+After exiting free spins (penny games) or action games, players become eligible for a mystery prize. The system tracks all R0.10 bets made during these features and awards them back as a mystery prize after a series of losing base game spins.
+
+#### How It Works
+
+1. **Bet Accumulation**:
+   - Every free spin deducts R0.10 (tracked in `AccumulatedPennyGameBets`)
+   - Every action game wheel spin deducts R0.10 (tracked in `AccumulatedActionGameBets`)
+   - Both pools accumulate separately throughout the session
+
+2. **Eligibility Trigger**:
+   - Mystery prize tracking starts when player exits free spins or action games
+   - Only applies to base game spins (not free spins or action game spins)
+
+3. **Prize Award**:
+   - Prize is awarded between **2-5 losing base game spins** after feature exit
+   - Random trigger: System randomly selects a number between 2-5
+   - Prize amount = Total of all accumulated R0.10 bets (penny games + action games)
+   - Prize is added to balance immediately
+   - Both accumulated pools reset to zero after prize is awarded
+
+4. **Reset Conditions**:
+   - Mystery prize pools reset after prize is awarded
+   - Winning base game spin resets the losing spin counter (but pools remain)
+   - Entering a new feature (free spins or action games) resets the losing counter
+
+#### Example Flow
+
+```
+1. Player completes 10 free spins (10 × R0.10 = R1.00 accumulated)
+2. Player completes 5 action game spins (5 × R0.10 = R0.50 accumulated)
+3. Total pool: R1.50
+4. Player exits features and plays base game
+5. Spin 1: Losing spin (counter = 1)
+6. Spin 2: Losing spin (counter = 2) - eligible for prize
+7. System randomly selects trigger: 3
+8. Spin 3: Losing spin (counter = 3) - MYSTERY PRIZE AWARDED!
+9. Player receives R1.50 (all accumulated bets)
+10. Pools reset to zero
+```
+
+#### Important Notes
+
+- ⚠️ Mystery prize only triggers on **losing base game spins**
+- ⚠️ Winning base game spin resets the counter (but doesn't clear pools)
+- ⚠️ Prize amount equals the total of all R0.10 bets made during features
+- ⚠️ Pools accumulate across multiple feature sessions until prize is awarded
+- ✅ Prize notification displayed when awarded
 
 ---
 
@@ -460,6 +520,9 @@ The following are tracked in session:
 - `totalWin`
 - `freeSpins`
 - `actionGames`
+- `mysteryPrizeAwarded` (if mystery prize was awarded)
+- `accumulatedPennyGameBets` (current pool amount)
+- `accumulatedActionGameBets` (current pool amount)
 
 ### Configuration
 
@@ -479,8 +542,9 @@ The following are tracked in session:
 ## Summary
 
 This game follows a **Book of Ra-style slot** with:
-- ✅ Free spins with expanding symbols
-- ✅ Action game wheel feature
+- ✅ Free spins with expanding symbols (R0.10 per spin)
+- ✅ Action game wheel feature (R0.10 per spin)
+- ✅ Mystery prize system (awards accumulated R0.10 bets)
 - ✅ Bet-specific payouts and triggers
 - ✅ Multiple game modes and features
 - ✅ Comprehensive animation and sound systems

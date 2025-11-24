@@ -24,7 +24,8 @@
 
 'use client';
 
-import { SlotMachine } from './slot-machine';
+import { SlotMachine, type SlotMachineDevModeHandle } from './slot-machine';
+import { type RefObject } from 'react';
 
 /**
  * Props interface for BottomSection component
@@ -45,9 +46,10 @@ interface BottomSectionProps {
   onFeatureSymbolSelectionStateChange?: (show: boolean, symbol: string, count: number) => void;
   onFeatureGameWinsStateChange?: (showFeatureGameWins: boolean) => void;
   showFeatureSymbolSelection?: boolean;
+  slotMachineRef?: RefObject<SlotMachineDevModeHandle>;
 }
 
-export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange, onActionWheelStateChange, onSessionIdChange, onBalanceUpdateCallback, showActionWheel, actionGameSpins, accumulatedActionWin, onActionWheelSpin, onActionWheelSpinTrigger, onFeatureSymbolSelectionStateChange, onFeatureGameWinsStateChange, showFeatureSymbolSelection }: BottomSectionProps) {
+export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSpinsStateChange, onActionWheelStateChange, onSessionIdChange, onBalanceUpdateCallback, showActionWheel, actionGameSpins, accumulatedActionWin, onActionWheelSpin, onActionWheelSpinTrigger, onFeatureSymbolSelectionStateChange, onFeatureGameWinsStateChange, showFeatureSymbolSelection, slotMachineRef }: BottomSectionProps) {
   return (
     // Main container: flex-[1.9] means this section takes 1.9/4.4 of the vertical space
     // flex flex-col: Vertical flex layout
@@ -65,6 +67,7 @@ export function BottomSection({ betAmount, setBetAmount, betPerPayline, onFreeSp
           - Displays win animations and feature games
         */}
         <SlotMachine 
+          ref={slotMachineRef}
           betAmount={betAmount}
           setBetAmount={setBetAmount}
           betPerPayline={betPerPayline}

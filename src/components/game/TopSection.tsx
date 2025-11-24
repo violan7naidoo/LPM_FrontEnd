@@ -17,6 +17,7 @@
 import { useGameConfig } from '@/hooks/use-game-config';
 import Image from 'next/image';
 import type { FrontendGameConfig, FrontendSymbolConfig } from '@/lib/game-config-types';
+import { DevModePanel } from '@/components/dev/dev-mode-panel';
 
 /**
  * Props interface for TopSection component
@@ -33,8 +34,10 @@ interface TopSectionProps {
   actionGameWinMessage?: string;
   actionGameWinAmount?: number;
   actionGamesFinished?: boolean;
+  accumulatedActionWin?: number; // Total accumulated wins from all action game spins
   showFeatureGameWins?: boolean; // Used for other feature game win logic (not currently used for expanding symbol display)
   showFeatureSymbolSelection?: boolean; // Whether the feature symbol selection animation is currently playing
+  isDevModeActive?: boolean; // Whether dev mode is active
 }
 
 /**
@@ -308,7 +311,7 @@ function LowPayCell({
  * - Grid: 2 columns, 4 rows with spacing
  * - Overlay: "10 PENNY GAMES" block positioned absolutely in center
  */
-export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, showActionWheel = false, actionGameWinMessage, actionGameWinAmount, actionGamesFinished = false, showFeatureGameWins = false, showFeatureSymbolSelection = false }: TopSectionProps) {
+export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, showActionWheel = false, actionGameWinMessage, actionGameWinAmount, actionGamesFinished = false, accumulatedActionWin = 0, showFeatureGameWins = false, showFeatureSymbolSelection = false, isDevModeActive = false }: TopSectionProps) {
   // Load game configuration from context/hook
   // This contains all symbol data, payouts, and action games
   const { config } = useGameConfig();
@@ -589,12 +592,19 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
               }}
             />
             {actionGamesFinished ? (
-              <p className="font-bold text-2xl relative z-10" style={{ 
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>ACTION GAMES FINISHED</p>
+              <>
+                <p className="font-bold text-2xl relative z-10" style={{ 
+                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>ACTION GAMES FINISHED</p>
+                {accumulatedActionWin > 0 && (
+                  <p className="font-bold text-xl sm:text-2xl md:text-2xl mt-3 relative z-10 text-white">
+                    Total Accumulated: R{accumulatedActionWin.toFixed(2)}
+                  </p>
+                )}
+              </>
             ) : showActionWheel && actionGameWinMessage ? (
               <>
                 <p className="font-bold text-xl sm:text-2xl md:text-2xl mb-3 text-center relative z-10" style={{ 
@@ -678,6 +688,9 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
           </div>
         </div>
       </div>
+      
+      {/* Dev Mode Panel - positioned at top right of TopSection */}
+      <DevModePanel isActive={isDevModeActive} />
     </div>
   );
 }
