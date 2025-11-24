@@ -50,7 +50,7 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
   const freeSpinsAwarded = useFreeSpinsAwarded();
   const reelStrips = useReelStrips();
   const paylines = usePaylines();
-  const { config } = useGameConfig();
+  const { config, gameId } = useGameConfig();
   const { toast } = useToast();
   
   // Get scatter symbol for preventing consecutive scatters
@@ -496,7 +496,7 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
         numPaylines: numPaylines,
         betPerPayline: betPerPayline, // Bet per payline in Rands (totalBet / numPaylines)
         actionGameSpins: (!isFreeSpinsMode && actionGameSpins > 0) ? actionGameSpins : undefined,
-        gameId: 'BOOK_OF_RA',
+        gameId: gameId || 'FROSTY_FORTUNES',
       });
 
       // Grid structure: 5 reels (columns) x 3 rows

@@ -68,7 +68,7 @@ function getGameId(): string {
     if (gameIdParam) return gameIdParam;
   }
   
-  return process.env.NEXT_PUBLIC_GAME_ID || 'BOOK_OF_RA';
+  return process.env.NEXT_PUBLIC_GAME_ID || 'FROSTY_FORTUNES';
 }
 
 /**

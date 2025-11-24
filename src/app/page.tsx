@@ -130,10 +130,12 @@ export default function Home() {
 
   /**
    * Callback to handle free spins state changes from SlotMachine
+   * Note: featureSymbol is NOT set here - it's set after the selection animation completes
    */
   const handleFreeSpinsStateChange = (isFreeSpins: boolean, symbol: string) => {
     setIsFreeSpinsMode(isFreeSpins);
-    setFeatureSymbol(symbol);
+    // Don't set featureSymbol here - wait for animation to complete
+    // The symbol will be set in handleFeatureSymbolSelectionComplete
   };
 
   /**
@@ -203,8 +205,14 @@ export default function Home() {
 
   /**
    * Handler for feature symbol selection completion
+   * This is called after the selection animation completes
+   * Now we can safely set the featureSymbol to display in TopSection
    */
   const handleFeatureSymbolSelectionComplete = () => {
+    // Set the feature symbol now that the animation has completed
+    if (selectedFeatureSymbol) {
+      setFeatureSymbol(selectedFeatureSymbol);
+    }
     setShowFeatureSymbolSelection(false);
     setSelectedFeatureSymbol('');
     setFreeSpinsCount(0);
@@ -314,6 +322,7 @@ export default function Home() {
         actionGameWinAmount={actionGameWinAmount}
         actionGamesFinished={actionGamesFinished}
         showFeatureGameWins={showFeatureGameWins}
+        showFeatureSymbolSelection={showFeatureSymbolSelection}
       />
       <MiddleSection 
         showActionWheel={showActionWheel}

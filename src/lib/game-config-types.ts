@@ -59,6 +59,7 @@ export interface FrontendGameConfig {
   symbols: Record<string, FrontendSymbolConfig>;
   paylines: number[][];
   reelStrips?: string[][]; // Optional: reel strips for spinning animation
+  featureReelStrips?: Record<string, string[][]>; // Optional: feature-specific reel strips for Book of Ra style games
   scatterPayout?: Record<string, Record<string, number>>; // Bet-specific scatter payouts
   scatterActionGames?: Record<string, Record<string, number>>; // Bet-specific scatter action games
 }
@@ -80,9 +81,14 @@ export interface FrontendGameConfig {
 export interface FrontendSymbolConfig {
   name: string;
   image: string;
-  // Bet-specific payouts: key is bet amount (e.g., "1.00"), value is count -> payout in Rands
+  // Legacy: Bet-specific payouts (for backward compatibility)
   payout?: Record<string, Record<string, number>>; // e.g., {"1.00": {"3": 1.00, "4": 5.00}, "2.00": {...}}
+  // New: Bet-specific payouts (preferred format)
+  payoutByBet?: Record<string, Record<string, number>>; // e.g., {"1.00": {"3": 1.00, "4": 5.00}, "2.00": {...}}
+  // Legacy: Bet-specific action games (for backward compatibility)
   actionGames?: Record<string, Record<string, number>>; // Bet-specific action games
+  // New: Bet-specific action games (preferred format)
+  actionGamesByBet?: Record<string, Record<string, number>>; // Bet-specific action games
 }
 
 /**

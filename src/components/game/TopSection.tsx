@@ -34,6 +34,7 @@ interface TopSectionProps {
   actionGameWinAmount?: number;
   actionGamesFinished?: boolean;
   showFeatureGameWins?: boolean; // Used for other feature game win logic (not currently used for expanding symbol display)
+  showFeatureSymbolSelection?: boolean; // Whether the feature symbol selection animation is currently playing
 }
 
 /**
@@ -77,11 +78,13 @@ function PayCell({
 
   // Extract bet-specific payout data for this symbol
   // Structure: { "5": 70.00, "4": 20.00, "3": 2.00, "2": 1.00 }
-  const payouts = symbol.payout?.[betKey] || {};
+  // Support both payoutByBet (new format) and payout (legacy format)
+  const payouts = (symbol as any).payoutByBet?.[betKey] || symbol.payout?.[betKey] || {};
   
   // Extract bet-specific action games data for this symbol
   // Structure: { "5": 13, "4": 1 } (action games awarded for specific combinations)
-  const actionGames = symbol.actionGames?.[betKey] || {};
+  // Support both actionGamesByBet (new format) and actionGames (legacy format)
+  const actionGames = (symbol as any).actionGamesByBet?.[betKey] || symbol.actionGames?.[betKey] || {};
 
   /**
    * formatPayout - Formats and displays a single payout line
@@ -207,8 +210,10 @@ function LowPayCell({
 
   // Low-pay symbols share the same payout structure, so we use the first symbol's data
   // This ensures consistency across all symbols in the group (A, K, Q, J, 10)
-  const payouts = symbols[0].payout?.[betKey] || {};
-  const actionGames = symbols[0].actionGames?.[betKey] || {};
+  // Support both payoutByBet (new format) and payout (legacy format)
+  const payouts = (symbols[0] as any).payoutByBet?.[betKey] || symbols[0].payout?.[betKey] || {};
+  // Support both actionGamesByBet (new format) and actionGames (legacy format)
+  const actionGames = (symbols[0] as any).actionGamesByBet?.[betKey] || symbols[0].actionGames?.[betKey] || {};
 
   const formatPayout = (count: number) => {
     if (hidePayouts.includes(count)) return null;
@@ -303,7 +308,7 @@ function LowPayCell({
  * - Grid: 2 columns, 4 rows with spacing
  * - Overlay: "10 PENNY GAMES" block positioned absolutely in center
  */
-export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, showActionWheel = false, actionGameWinMessage, actionGameWinAmount, actionGamesFinished = false, showFeatureGameWins = false }: TopSectionProps) {
+export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, showActionWheel = false, actionGameWinMessage, actionGameWinAmount, actionGamesFinished = false, showFeatureGameWins = false, showFeatureSymbolSelection = false }: TopSectionProps) {
   // Load game configuration from context/hook
   // This contains all symbol data, payouts, and action games
   const { config } = useGameConfig();
@@ -426,8 +431,10 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
               {(() => {
                 const symbol = config?.symbols?.[scatterSymbol];
                 if (!symbol) return null;
-                const payouts = symbol.payout?.[betKey] || {};
-                const actionGames = symbol.actionGames?.[betKey] || {};
+                // Support both payoutByBet (new format) and payout (legacy format)
+                const payouts = (symbol as any).payoutByBet?.[betKey] || symbol.payout?.[betKey] || {};
+                // Support both actionGamesByBet (new format) and actionGames (legacy format)
+                const actionGames = (symbol as any).actionGamesByBet?.[betKey] || symbol.actionGames?.[betKey] || {};
                 const formatPayout = (count: number) => {
                   if (count === 2) return null;
                   const countKey = count.toString();
@@ -609,8 +616,9 @@ export function TopSection({ betAmount, isFreeSpinsMode = false, featureSymbol, 
                   </p>
                 )}
               </>
-            ) : isFreeSpinsMode && featureSymbol ? (
+            ) : isFreeSpinsMode && featureSymbol && !showFeatureSymbolSelection ? (
               // Show expanding symbol during free spins (not just after expansion)
+              // Only show if the selection animation is not currently playing
               <>
                 <p className="font-bold text-xl mb-3 relative z-10" style={{ 
                   background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
