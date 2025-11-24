@@ -110,6 +110,13 @@ export const ActionWheel = forwardRef<ActionWheelHandle, ActionWheelProps>(({
     try {
       const spinResponse = await onSpin();
       
+      // Check if there was an error (e.g., insufficient balance)
+      if (!spinResponse) {
+        setIsSpinning(false);
+        stopSpinSound();
+        return;
+      }
+      
       // Map backend result to segment index
       // Backend returns: "R10", "6spins", or "0"
       // The wheel is arranged like a clock, so we need to find the correct segment

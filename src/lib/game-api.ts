@@ -81,6 +81,9 @@ export interface PlayResponse {
   freeSpins: number;
   actionGameSpins: number;
   featureSymbol: string;
+  mysteryPrizeAwarded?: number;
+  accumulatedPennyGameBets?: number;
+  accumulatedActionGameBets?: number;
 }
 
 export interface SpinResult {

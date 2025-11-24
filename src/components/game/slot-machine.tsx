@@ -853,6 +853,18 @@ export function SlotMachine({ betAmount, setBetAmount, betPerPayline, onFreeSpin
       setFeatureSymbol(response.player.featureSymbol);
       setLastWin(response.player.lastWin);
 
+      // Handle mystery prize if awarded
+      if (response.mysteryPrizeAwarded && response.mysteryPrizeAwarded > 0) {
+        console.log(`[MYSTERY PRIZE] Awarded R${response.mysteryPrizeAwarded}`);
+        toast({
+          title: '🎁 Mystery Prize!',
+          description: `You've been awarded R${response.mysteryPrizeAwarded.toFixed(2)}!`,
+          duration: 5000,
+        });
+        // Play a special sound for mystery prize (if available)
+        // playMysteryPrizeSound();
+      }
+
       // Handle action game wins - use backend's accumulated value if available
       // Backend tracks AccumulatedActionGameWin in session state
       const backendAccumulatedWin = response.player.accumulatedActionGameWin ?? 0;
